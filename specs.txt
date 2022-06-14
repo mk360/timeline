@@ -1,0 +1,14 @@
+Glossaire : 
+- Ligne de référence : Ligne où se situent toutes les informations d'horodatage (ex. année, mois, jour, etc.)
+- Période : étendue continue de temps
+- Événement : un point temporel et ponctuel dans le temps
+- Ligne temporelle : Ligne qui se superpose à la ligne de référence, et qui définit l'étendue d'une période d'un événement
+
+Requis :
+- Faire une ligne de référence
+- Pouvoir passer des périodes et des événements sur les lignes temporelles
+- Pouvoir définir des temps relatifs et des temps absolus
+- Pouvoir créer plusieurs lignes temporelles : elles s'empilent par le dessus ou par le dessous en fonction de là où il y a de la place
+- Pouvoir ajouter des événements ponctuels associés à une période
+- Pouvoir mettre des labels sur les périodes, lignes temporelles (un peu comme l'axe d'un graphe) et événements
+- S'inspirer de http://timeline.knightlab.com/ pour le rendu visuel
