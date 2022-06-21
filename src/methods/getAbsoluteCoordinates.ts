@@ -1,5 +1,6 @@
-import SvgConfig from "./constants/svg-config";
-import SvgCoordinates from "./interfaces/svg-coordinate";
+import SvgConfig from "../constants/svg-config";
+import SvgCoordinates from "../interfaces/svg-coordinate";
+import getAbsoluteValue from './getAbsoluteValue';
 
 /**
  * Calculate absolute coordinates depending on the configured
@@ -12,8 +13,8 @@ import SvgCoordinates from "./interfaces/svg-coordinate";
  */
 function getAbsoluteCoordinates(relativeX: number, relativeY: number): SvgCoordinates {
     return {
-        x: SvgConfig.width * relativeX / 100,
-        y: SvgConfig.height * relativeY / 100,
+        x: getAbsoluteValue(relativeX, SvgConfig.width),
+        y: getAbsoluteValue(relativeY, SvgConfig.height),
     }; 
 };
 
