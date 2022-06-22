@@ -1,4 +1,3 @@
-import SVG from './svg';
 import ComponentFactory from './classes/componentFactory';
 import draggable from './plugins/draggable';
 

@@ -1,4 +1,4 @@
-function draggable(element: SVGElement) {
+function draggable<T extends SVGElement>(element: T) {
     let shouldDrag = false;
 
     element.onmousedown = function(event) {
