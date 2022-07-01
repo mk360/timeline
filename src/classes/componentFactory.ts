@@ -1,9 +1,12 @@
-import SvgCoordinates from '../interfaces/svg-coordinate';
 import getAbsoluteCoordinates from '../methods/getAbsoluteCoordinates';
 import SVG from '../svg';
 import degreesToRadians from '../methods/degreesToRadians';
+import zoomable from '../plugins/zoomable';
 
 const svgNS = "http://www.w3.org/2000/svg";
+const group = zoomable(document.createElementNS(svgNS, 'g'));
+group.setAttribute('transform', 'scale(1)');
+SVG.appendChild(group);
 
 class ComponentFactory {
     createCircle(relativeX: number, relativeY: number, radius: number, fillColor: string) {
@@ -64,8 +67,13 @@ class ComponentFactory {
         return line;
     };
 
+    createGroup() {
+
+        this.appendToSVG(group);
+    }
+
     private appendToSVG(element: SVGElement) {
-        SVG.appendChild(element);
+        group.appendChild(element);
     };
 };
 
