@@ -40,10 +40,6 @@ function draggable<T extends SVGElement>(element: T) {
                 element.setAttribute('x', (currentX + movementX).toString());
             }
         }
-
-        if (element instanceof SVGCircleElement) {
-        }
-
     };
 
     return element;

@@ -2,10 +2,11 @@ import getAbsoluteCoordinates from '../methods/getAbsoluteCoordinates';
 import SVG from '../svg';
 import degreesToRadians from '../methods/degreesToRadians';
 import zoomable from '../plugins/zoomable';
+import getAbsoluteValue from '../methods/getAbsoluteValue';
+import SvgConfig from '../constants/svg-config';
 
 const svgNS = "http://www.w3.org/2000/svg";
 const group = zoomable(document.createElementNS(svgNS, 'g'));
-group.setAttribute('transform', 'scale(1)');
 SVG.appendChild(group);
 
 class ComponentFactory {
@@ -36,14 +37,15 @@ class ComponentFactory {
         return box;
     };
 
-    createText(relativeX: number, relativeY: number, content: string, relativeSize: number, color: string) {
+    createText(relativeX: number, relativeY: number, content: string, pixelSize: number, color: string) {
         const text = document.createElementNS(svgNS, 'text');
-        text.textContent = content;
+        const sizeInSVG = getAbsoluteValue(pixelSize, SvgConfig.height);
         const { x, y } = getAbsoluteCoordinates(relativeX, relativeY);
+        text.setAttribute('textContent', content);
         text.setAttribute('x', x.toString());
         text.setAttribute('y', y.toString());
         text.setAttribute('fill', color);
-        text.setAttribute('font-size', relativeSize.toString() + 'px');
+        text.setAttribute('font-size', sizeInSVG.toString() + 'px');
 
         this.appendToSVG(text);
 
@@ -66,11 +68,6 @@ class ComponentFactory {
 
         return line;
     };
-
-    createGroup() {
-
-        this.appendToSVG(group);
-    }
 
     private appendToSVG(element: SVGElement) {
         group.appendChild(element);
