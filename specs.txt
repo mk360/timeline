@@ -12,3 +12,6 @@ Requis :
 - Pouvoir ajouter des événements ponctuels associés à une période
 - Pouvoir mettre des labels sur les périodes, lignes temporelles (un peu comme l'axe d'un graphe) et événements
 - S'inspirer de http://timeline.knightlab.com/ pour le rendu visuel
+
+Nice to have : 
+- Pouvoir rendre les lignes temporelles (et leurs contenus, donc) indépendantes d'un système précis de calendrier
