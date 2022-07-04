@@ -1,4 +1,4 @@
-import ComponentFactory from './classes/componentFactory';
+import ComponentFactory from './classes/component-factory';
 import Timeline from './classes/timelineHandler';
 
 const circle = ComponentFactory.createCircle(50, 50, 50, 'red');
