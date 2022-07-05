@@ -1,5 +1,5 @@
 import ComponentFactory from './classes/component-factory';
-import Timeline from './classes/timelineHandler';
+// import Timeline from './classes/timelineHandler';
 
 const circle = ComponentFactory.createCircle(50, 50, 50, 'red');
 const box = ComponentFactory.createBox(0, 0, 140, 140, 'blue');

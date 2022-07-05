@@ -3,8 +3,9 @@
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "es6",
+    "module": "System",
     "target": "es5",
+    "outDir": "./dist"
   },
   "files": ["src/index.ts"]
 }
