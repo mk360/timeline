@@ -3,7 +3,6 @@
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "System",
     "target": "es5",
     "outDir": "./dist"
   },

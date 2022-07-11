@@ -15,11 +15,10 @@
   "version": "1.0.0",
   "description": "My webpack project",
   "scripts": {
-    "watch": "webpack --watch",
+    "watch": "webpack serve --port 8080",
     "build": "webpack --mode=production --node-env=production",
     "build:dev": "webpack --mode=development",
-    "build:prod": "webpack --mode=production --node-env=production",
-    "serve": "webpack serve"
+    "build:prod": "webpack --mode=production --node-env=production"
   },
   "name": "my-webpack-project",
   "contributors": [
