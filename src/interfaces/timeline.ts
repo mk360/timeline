@@ -1,8 +1,8 @@
-import ReferenceLine from 'referenceLine.ts'
-import TemporalLineStruct from 'temporalLine.ts'
+import CalendarStruct from './referenceLine'
+import TemporalLineStruct from './temporalLine'
 
 interface TimelineStruct {
-	baseline: ReferenceLine;
+	calendar: CalendarStruct;
 	temporalLines: TemporalLineStruct[];
 }
 

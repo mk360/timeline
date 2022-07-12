@@ -1,13 +1,15 @@
 import PeriodStruct from '../interfaces/period';
+import Chronon from '../interfaces/chronon';
 
 class Period implements PeriodStruct {
 	id: number;
 	name: string;
 	desc?: string;
-	start: number | number[];
-	end?: number | number[];
+	start: number;
+	end?: number;
+	sub_chronons: Chronon[];
 
-	constructor(name: string, start: number[], end: number[], desc?: string) {
+	constructor(name: string, start: number, end: number, desc?: string) {
 		//construct id
 		this.name = name;
 		this.start = start;
