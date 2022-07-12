@@ -1,5 +1,6 @@
 import ComponentFactory from './classes/component-factory';
-// import Timeline from './classes/timelineHandler';
+import Timeline from './classes/timelineHandler';
+import BaseTimelineRenderer from './classes/baseRenderer';
 
 const circle = ComponentFactory.createCircle(50, 50, 50, 'red');
 const box = ComponentFactory.createBox(0, 0, 140, 140, 'blue');
@@ -8,11 +9,13 @@ const line = ComponentFactory.createLine(40, 40, 300, 180, 'pink', 20);
 
  
 // Exemple d'utilisation (sans offsets)
-/*
-let ww2tl = Timeline;
+
+let ww2tl = new Timeline(new BaseTimelineRenderer());
 ww2tl.addDivision("année", 12);
+console.log(ww2tl.calendar.divisions);
 ww2tl.addDivision("mois", [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]);
-ww2tl.addDivision("jour");
+console.log(ww2tl.calendar.divisions);
+/*ww2tl.addDivision("jour");
 
 ww2tl.setStartingPoint([1939, 9, 1]);
 
