@@ -11,36 +11,19 @@ class Timeline implements TimelineStruct {
 
 	constructor(rndr: AbsTimelineRenderer) {
 		this.renderer = rndr;
+		this.temporalLines = [];
 		console.log("Constructed new Timeline");
 	}
 
-	addDivision(name: string, subdivisionsLength?: number | number[], subdivisionsNames?: string[]): void {
-		this.calendar.divisions.push({name, subdivisionsLength, subdivisionsNames});
+	addDivision(name: string, unitsLength?: number | number[], unitsNames?: string[]): void {
+		this.calendar.divisions.push({name, unitsLength, unitsNames});
 		this.calendar.computeCalendarConvTable();
 	};
 
 	setStartingPoint(divValues: number[]): void;
 	setStartingPoint(timeElapsed: number): void;	//time elapsed since 01/01/0001 ou whatever équivalent dans le calendrier
 	setStartingPoint(time: any): void {
-		if (Array.isArray(time))
-		{
-			this.calendar.startingPoint = time;
-		}
-		else if (typeof time === 'number')
-		{
-			let date: number[];
-			let i: number = 0;
-
-			do {
-				let divisor = this.calendar.getConv(i, -1);
-
-				date[i] = Math.floor(time/divisor);
-				time = time%divisor;
-				++i;
-
-			} while (time !== 0);
-		}
-
+		this.calendar.setStartingPoint(time);
 	};
 
 	addTemporalLine(name: string, pos?: number): TemporalLine {
@@ -59,6 +42,9 @@ class Timeline implements TimelineStruct {
 		return newTmpL;
 	};
 
+	getConvRate(div1: number, div2?: number) {
+		return this.calendar.getConv(div1, div2);
+	}
 }
 
 export default Timeline;

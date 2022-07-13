@@ -1,8 +1,8 @@
-import Chronon from 'chronon'
+import Chronon from './chronon'
 
 interface PeriodStruct extends Chronon {
-	start: number; //| Chronon;
-	end?: number; //| Chronon;
+	start: number | Chronon;
+	end?: number | Chronon;
 
 	sub_chronons: Chronon[];
 

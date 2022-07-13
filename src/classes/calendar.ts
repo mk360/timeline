@@ -1,5 +1,6 @@
 import CalendarStruct from '../interfaces/referenceLine'
 import Division from '../interfaces/division'
+import { Vector, Matrix } from 'ts-matrix';
 
 /* ===CALENDAR NOTES
 
@@ -10,78 +11,118 @@ import Division from '../interfaces/division'
 */
 
 class Calendar implements CalendarStruct {
-	startingPoint: number[] = [];
-	divisions: Division[] = []; //En fait, on devrait avoir le nom de la division (année, jour, mois), sa durée, et le nom de la subdivison (Janvier, Lundi, etc.)
+	startingPoint: number;
+	divisions: Division[];
 
 	//secondaryDivisions: Division[] (?) // Pour les semaines
 
-	calendarConvTable: number[][] = [[]]; // Le must serait d'avoir ts-matrix pour faire une matrice de number 
+	calendarConvTable: Matrix; 
 
-/*	constructor() {
-		this.startingPoint = [];
+	constructor() {
+		this.startingPoint = 0;
 		this.divisions = [];
-	}*/
+		this.calendarConvTable = new Matrix(1, 1);
+	};
 
-//--- <Giant mess>
 	computeCalendarConvTable() {
-		if (this.divisions.length<2)
-			0;
+		if (this.divisions.length<2) {
+			this.calendarConvTable.values[0][0] = 1;
 
-		for (let division1 in this.divisions) {
-			for (let division2 in this.divisions) {
-				console.log("("+division1+", "+division2+")");
-				console.log("typeof is "+typeof this.calendarConvTable[Number(division1)][Number(division2)]);
-				this.calendarConvTable[Number(division1)][Number(division2)] = this.computeCalendarLengthOfDeepness(Number(division1), Number(division2));
-				console.log("("+division1+", "+division2+") : "+this.getConv(Number(division1), Number(division2)));
+			return;
+		}
+
+		this.calendarConvTable = new Matrix(this.divisions.length, this.divisions.length);
+
+		for (let i = 0; i < this.divisions.length; ++i) {
+			for (let j = 0; j < this.divisions.length; ++j) {
+				this.calendarConvTable.values[i][j] = this.computeCalendarLengthOfDeepness(i, j);
 			}
 
 		}
 
-	}
+		this.printConvTable();
+	};
 
 	private computeCalendarLengthOfDeepness(deepness: number, maxDeepness: number = -1): number | null {
 		if (maxDeepness == -1)
-			maxDeepness = this.divisions.length;
+			maxDeepness = this.divisions.length-1;
 
-		if (deepness >= maxDeepness)
+		if (deepness == maxDeepness)
+			return 1;
+		if (deepness > maxDeepness)
 			return null;
 
 		let sublength: number;
 		let currDiv: Division = this.divisions[deepness];
-		let typeLookahead: string = typeof this.divisions[deepness+1].subdivisionsLength;
 
-		if (typeof currDiv.subdivisionsLength === 'number')
-			sublength = currDiv.subdivisionsLength;
-		else if (Array.isArray(currDiv.subdivisionsLength))
-			sublength = currDiv.subdivisionsLength.reduce((accumulator, current) => {return (accumulator + current)/2;}, 0)*currDiv.subdivisionsLength.length;
-		else if (typeof currDiv.subdivisionsLength === 'undefined')
+		if (typeof currDiv.unitsLength === 'number')
+			sublength = currDiv.unitsLength;
+		else if (Array.isArray(currDiv.unitsLength))
+			sublength = currDiv.unitsLength.reduce((accumulator, current) => {return (accumulator + current);}, 0)/currDiv.unitsLength.length;
+		else if (typeof currDiv.unitsLength === 'undefined')
 			sublength = 1;
 
-		if (typeLookahead === 'number')
-			return sublength*(this.computeCalendarLengthOfDeepness(deepness+1) ?? 1);
-		else if (typeLookahead === 'number[]')
-			return sublength+(this.computeCalendarLengthOfDeepness(deepness+1) ?? 0);
+		if (this.divisions[deepness+1].unitsLength !== undefined) {
+
+			if (typeof this.divisions[deepness+1].unitsLength === 'number')
+				return sublength*(this.computeCalendarLengthOfDeepness(deepness+1, maxDeepness) ?? 1);
+			else if (Array.isArray(this.divisions[deepness+1].unitsLength))
+				return sublength*(this.computeCalendarLengthOfDeepness(deepness+1, maxDeepness) ?? 1);
+		}
 		else
 			return sublength;
-	}
-//--- </Giant mess>
+
+	};
+
+	setStartingPoint(divValues: number[]): void;
+	setStartingPoint(timeElapsed: number): void;	//time elapsed since 01/01/0001 ou whatever équivalent dans le calendrier
+	setStartingPoint(time: any): void {
+		if (Array.isArray(time))
+			this.startingPoint = this.getElapsedTime(time);
+		else if (typeof time === 'number')
+		{
+			let date: number[];
+			let i: number = 0;
+
+			do {
+				let divisor = this.getConv(i, -1);
+
+				date[i] = Math.floor(time/divisor);
+				time = time%divisor;
+				++i;
+
+			} while (time !== 0);
+		}
+	};
 
 	getElapsedTime(date: number[], fromBasePoint: boolean = false): number {
-		let elapsedTime: number;
+		let elapsedTime: number = 0;
 
-		for (let index in date)
-			elapsedTime += date[index]*this.calendarConvTable[index][this.divisions.length-1];
+		for (let i = 0; i < date.length; ++i)
+			elapsedTime += (date[i]-1)*this.getConv(i);
 
 		return elapsedTime;
-	}
+	};
 
-	getConv(supUnit: number, subUnit: number)
+	getConv(supUnit: number, subUnit: number = -1)
 	{
 		if (subUnit == -1)
 			subUnit = this.divisions.length-1;
 
-		return this.calendarConvTable[supUnit][subUnit];
-	}
+		return this.calendarConvTable.at(supUnit, subUnit);
+	};
+
+	printConvTable() {
+		let str: string;
+		for (let i = 0; i < this.divisions.length; ++i) {
+			str='';
+			for (let j = 0; j < this.divisions.length; ++j) {
+				str = str + this.calendarConvTable.at(i, j) + ', ';
+			}
+			console.log(str);
+		}
+
+	};
 
 }
 

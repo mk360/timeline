@@ -1,7 +1,7 @@
 interface Division {
 	name: string;
-	subdivisionsLength?: number | number[];
-	subdivisionsNames?: string[];
+	unitsLength?: number | number[];
+	unitsNames?: string[];
 }
 
 export default Division;

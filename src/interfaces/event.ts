@@ -1,4 +1,4 @@
-import Chronon from 'chronon';
+import Chronon from './chronon';
 
 interface EventStruct extends Chronon {
 	occuring_time: number; //| Chronon;

@@ -13,13 +13,16 @@ const line = ComponentFactory.createLine(40, 40, 300, 180, 'pink', 20);
 let ww2tl = new Timeline(new BaseTimelineRenderer());
 ww2tl.addDivision("année", 12);
 console.log(ww2tl.calendar.divisions);
-ww2tl.addDivision("mois", [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]);
+ww2tl.addDivision("mois", [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"]);
 console.log(ww2tl.calendar.divisions);
-/*ww2tl.addDivision("jour");
+ww2tl.addDivision("jour");
+console.log(ww2tl.calendar.divisions);
 
 ww2tl.setStartingPoint([1939, 9, 1]);
+console.log(ww2tl.calendar.startingPoint);
 
 let germanyTpl = ww2tl.addTemporalLine("Allemagne");
+console.log(ww2tl.temporalLines);
 let evntHitlerChancelier = germanyTpl.addEvent("Adolf Hitler est nommé chancelier du Reich", [1933, 1, 30]);
 let evntArrestationDonitz = germanyTpl.addEvent("Arrestation de Karl Dönitz", [1945, 5, 23]);
 let thirdReichPeriod = germanyTpl.addPeriod("Troisième Reich", evntHitlerChancelier, evntArrestationDonitz);
@@ -28,7 +31,7 @@ let evntIncendieReichstag = germanyTpl.addEvent("Incendie du Reichstag", [1933, 
 
 let perGleichschaltung = thirdReichPeriod.addPeriod("Gleichschaltung", [1933, 2, 28], [1934, 8, 19]);
 perGleichschaltung.addEvent("Adolf Hitler obtient les pleins pouvoirs", [1933, 3, 23]);
-
+/*
 germanyTpl.addPeriod("Allemange occupée", thirdReichPeriod.end);
 
 let tplGlobalEvents = ww2tl.addTemporalLine("Évènements généraux");
