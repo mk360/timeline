@@ -7,10 +7,8 @@ import AbsTimelineRenderer from './abstractRenderer';
 class Timeline implements TimelineStruct {
 	calendar: Calendar = new Calendar();
 	temporalLines: TemporalLine[];
-	renderer: AbsTimelineRenderer;
 
-	constructor(rndr: AbsTimelineRenderer) {
-		this.renderer = rndr;
+	constructor() {
 		this.temporalLines = [];
 		console.log("Constructed new Timeline");
 	}
