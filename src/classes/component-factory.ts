@@ -10,6 +10,12 @@ const group = zoomable(document.createElementNS(svgNS, 'g'));
 SVG.appendChild(group);
 
 class ComponentFactory {
+    createAbsoluteGroup(x: number, y: number) {
+        const childGroup = document.createElementNS(svgNS, 'g');
+        childGroup.setAttribute('x', x.toString());
+        childGroup.setAttribute('y', y.toString());
+    };
+
     createCircle(relativeX: number, relativeY: number, radius: number, fillColor: string) {
         const circle = document.createElementNS(svgNS, 'circle');
         const { x, y } = getAbsoluteCoordinates(relativeX, relativeY);

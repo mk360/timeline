@@ -1,11 +1,12 @@
 import SvgConfig from '../constants/svg-config';
 import Chronon from '../interfaces/chronon';
-import SvgCoordinates from '../interfaces/svg-coordinate';
+import hoverable from '../plugins/hoverable';
 import TemporalLineStruct from '../interfaces/temporalLine';
 import AbsTimelineRenderer from './abstractRenderer';
 import componentFactory from './component-factory';
 import Event from './event';
 import Timeline from './timelineHandler';
+import SVG from '../svg';
 
 class BaseTimelineRenderer extends AbsTimelineRenderer {
 	tl: Timeline;
@@ -34,23 +35,21 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 
 	renderEvent(event: Event, referenceLine: SVGLineElement) {
 		const { occuring_time } = event;
-		const y2 = +referenceLine.getAttribute('y1');
+		const y1 = +referenceLine.getAttribute('y1');
 		const eventPosition = Math.abs(+referenceLine.getAttribute('x1') -  +referenceLine.getAttribute('x2')) / 2;
-
-		// const eventLineFirstCoordinates: SvgCoordinates = {
-		// 	x: eventPosition,
-		// 	y: y2,
-		// };
-		const eventLine = componentFactory.createAbsoluteLine(eventPosition, y2, 40, -77, 'black', 1);
+		const eventLine = componentFactory.createAbsoluteLine(eventPosition, y1, 40, -90, 'gray', 1);
 		const eventLineX2 = +eventLine.getAttribute('x2');
 		const eventLineY2 = +eventLine.getAttribute('y2');
 		const boxHeight = 40;
-		const eventBox = componentFactory.createAbsoluteBox(eventLineX2 - 2, eventLineY2 - boxHeight / 2, boxHeight, boxHeight * 2, 'rgba(200, 200, 200, 0.9)');
-		const topLeftCorner: SvgCoordinates = {
-			x: +eventBox.getAttribute('x') + 4,
-			y: +eventBox.getAttribute('y') + 15,
-		};
-		const eventLabel = componentFactory.createAbsoluteText(topLeftCorner.x, topLeftCorner.y, event.name, 16, 'black');
+		const eventBox = hoverable(componentFactory.createAbsoluteBox(eventLineX2 - 1, eventLineY2 - boxHeight / 2, boxHeight, boxHeight * 2, 'rgba(200, 200, 200, 0.9)'), {
+			in(element) {
+				element.setAttribute('fill', 'red');
+			},
+			out(element) {
+				element.setAttribute('fill', 'rgba(200, 200, 200, 0.9)');
+			}
+		});
+		const eventLabel = componentFactory.createAbsoluteText(+eventBox.getAttribute('x') + 4, +eventBox.getAttribute('y') + 15, event.name, 16, 'black');
 		eventBox.setAttribute('width', `${eventLabel.getBBox().width + 10}px`);
 	}
 }
