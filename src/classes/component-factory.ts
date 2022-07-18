@@ -24,8 +24,13 @@ class ComponentFactory {
     };
 
     createBox(relativeX: number, relativeY: number, height: number, width: number, fillColor: string) {
-        const box = document.createElementNS(svgNS, 'rect');
         const { x, y } = getAbsoluteCoordinates(relativeX, relativeY);
+
+        return this.createAbsoluteBox(x, y, height, width, fillColor);
+    };
+
+    createAbsoluteBox(x: number, y: number, height: number, width: number, fillColor: string) {
+        const box = document.createElementNS(svgNS, 'rect');
         box.setAttribute('x', x.toString());
         box.setAttribute('y', y.toString());
         box.setAttribute('height', height.toString());
@@ -38,14 +43,19 @@ class ComponentFactory {
     };
 
     createText(relativeX: number, relativeY: number, content: string, pixelSize: number, color: string) {
-        const text = document.createElementNS(svgNS, 'text');
-        const sizeInSVG = getAbsoluteValue(pixelSize, SvgConfig.height);
         const { x, y } = getAbsoluteCoordinates(relativeX, relativeY);
-        text.setAttribute('textContent', content);
+        const sizeInSVG = getAbsoluteValue(pixelSize, SvgConfig.height);
+
+        return this.createAbsoluteText(x, y, content, sizeInSVG, color);
+    };
+
+    createAbsoluteText(x: number, y: number, content: string, pixelSize: number, color: string) {
+        const text = document.createElementNS(svgNS, 'text');
+        text.innerHTML = content;
         text.setAttribute('x', x.toString());
         text.setAttribute('y', y.toString());
         text.setAttribute('fill', color);
-        text.setAttribute('font-size', sizeInSVG.toString() + 'px');
+        text.setAttribute('font-size', pixelSize.toString() + 'px');
 
         this.appendToSVG(text);
 
@@ -53,8 +63,13 @@ class ComponentFactory {
     };
 
     createLine(relativeX: number, relativeY: number, length: number, angle: number, color: string, strokeWidth: number) {
-        const line = document.createElementNS(svgNS, 'line');
         const { x, y } = getAbsoluteCoordinates(relativeX, relativeY);
+
+        return this.createAbsoluteLine(x, y, length, angle, color, strokeWidth);
+    };
+
+    createAbsoluteLine(x: number, y: number, length: number, angle: number, color: string, strokeWidth: number) {
+        const line = document.createElementNS(svgNS, 'line');
         line.setAttribute('x1', x.toString());
         line.setAttribute('y1', y.toString());
         const radians = degreesToRadians(angle);
