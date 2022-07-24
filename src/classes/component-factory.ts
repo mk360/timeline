@@ -10,13 +10,17 @@ const group = zoomable(document.createElementNS(svgNS, 'g'));
 SVG.appendChild(group);
 
 class ComponentFactory {
-    createAbsoluteGroup(x: number, y: number) {
+    createAbsoluteGroup(appendToSVG = true) {
         const childGroup = document.createElementNS(svgNS, 'g');
-        childGroup.setAttribute('x', x.toString());
-        childGroup.setAttribute('y', y.toString());
+
+        if (appendToSVG) {
+            this.appendToSVG(childGroup);
+        }
+
+        return childGroup;
     };
 
-    createCircle(relativeX: number, relativeY: number, radius: number, fillColor: string) {
+    createCircle(relativeX: number, relativeY: number, radius: number, fillColor: string, appendToSVG = true) {
         const circle = document.createElementNS(svgNS, 'circle');
         const { x, y } = getAbsoluteCoordinates(relativeX, relativeY);
         circle.setAttribute('cx', x.toString());
@@ -24,18 +28,20 @@ class ComponentFactory {
         circle.setAttribute('r', radius.toString());
         circle.setAttribute('fill', fillColor);
 
-        this.appendToSVG(circle);
+        if (appendToSVG) {
+            this.appendToSVG(circle);
+        }
 
         return circle;
     };
 
-    createBox(relativeX: number, relativeY: number, height: number, width: number, fillColor: string) {
+    createBox(relativeX: number, relativeY: number, height: number, width: number, fillColor: string, appendToSVG = true) {
         const { x, y } = getAbsoluteCoordinates(relativeX, relativeY);
 
         return this.createAbsoluteBox(x, y, height, width, fillColor);
     };
 
-    createAbsoluteBox(x: number, y: number, height: number, width: number, fillColor: string) {
+    createAbsoluteBox(x: number, y: number, height: number, width: number, fillColor: string, appendToSVG = true) {
         const box = document.createElementNS(svgNS, 'rect');
         box.setAttribute('x', x.toString());
         box.setAttribute('y', y.toString());
@@ -43,19 +49,21 @@ class ComponentFactory {
         box.setAttribute('width', width.toString());
         box.setAttribute('fill', fillColor);
 
-        this.appendToSVG(box);
+        if (appendToSVG) {
+            this.appendToSVG(box);
+        }
 
         return box;
     };
 
-    createText(relativeX: number, relativeY: number, content: string, pixelSize: number, color: string) {
+    createText(relativeX: number, relativeY: number, content: string, pixelSize: number, color: string, appendToSVG = true) {
         const { x, y } = getAbsoluteCoordinates(relativeX, relativeY);
         const sizeInSVG = getAbsoluteValue(pixelSize, SvgConfig.height);
 
-        return this.createAbsoluteText(x, y, content, sizeInSVG, color);
+        return this.createAbsoluteText(x, y, content, sizeInSVG, color, appendToSVG);
     };
 
-    createAbsoluteText(x: number, y: number, content: string, pixelSize: number, color: string) {
+    createAbsoluteText(x: number, y: number, content: string, pixelSize: number, color: string, appendToSVG = true) {
         const text = document.createElementNS(svgNS, 'text');
         text.innerHTML = content;
         text.setAttribute('x', x.toString());
@@ -63,18 +71,20 @@ class ComponentFactory {
         text.setAttribute('fill', color);
         text.setAttribute('font-size', pixelSize.toString() + 'px');
 
-        this.appendToSVG(text);
+        if (appendToSVG) {
+            this.appendToSVG(text);
+        }
 
         return text;
     };
 
-    createLine(relativeX: number, relativeY: number, length: number, angle: number, color: string, strokeWidth: number) {
+    createLine(relativeX: number, relativeY: number, length: number, angle: number, color: string, strokeWidth: number, appendToSVG = true) {
         const { x, y } = getAbsoluteCoordinates(relativeX, relativeY);
 
-        return this.createAbsoluteLine(x, y, length, angle, color, strokeWidth);
+        return this.createAbsoluteLine(x, y, length, angle, color, strokeWidth, appendToSVG);
     };
 
-    createAbsoluteLine(x: number, y: number, length: number, angle: number, color: string, strokeWidth: number) {
+    createAbsoluteLine(x: number, y: number, length: number, angle: number, color: string, strokeWidth: number, appendToSVG = true) {
         const line = document.createElementNS(svgNS, 'line');
         line.setAttribute('x1', x.toString());
         line.setAttribute('y1', y.toString());
@@ -85,7 +95,9 @@ class ComponentFactory {
         line.setAttribute('y2', y2.toString());
         line.setAttribute('style', `stroke:${color};stroke-width:${strokeWidth}`);
 
-        this.appendToSVG(line);
+        if (appendToSVG) {
+            this.appendToSVG(line);
+        }
 
         return line;
     };

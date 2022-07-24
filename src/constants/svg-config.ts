@@ -4,6 +4,7 @@ const SvgConfig = {
     backgroundColor: 'white',
     horizontalCropping: 0,
     verticalCropping: 0,
+    temporalLineHeight: 80,
 };
 
 export default SvgConfig;
