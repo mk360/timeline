@@ -6,6 +6,7 @@ import AbsTimelineRenderer from './abstractRenderer';
 import componentFactory from './component-factory';
 import Event from './event';
 import Timeline from './timelineHandler';
+import Period from './period';
 
 function* getNextPositionMultiplier() {
 	let multiplier = 0;
@@ -29,38 +30,49 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 	render(timeline: Timeline) {
 		this.tl = timeline;
 
-		this.renderRefLine();
-	}
-
-	renderRefLine() {
-		let temporalLinePosition = SvgConfig.temporalLineHeight;
-
+		let temporalLinePosition = SvgConfig.height / 2;
 		for (let line of this.tl.temporalLines) {
 			this.renderTemporalLine(line, temporalLinePosition);
 			temporalLinePosition *= this.positionMultiplier.next().value;
 		}
-		this.renderTemporalLine(this.tl.temporalLines[0], temporalLinePosition);
+		this.renderRefLine();
+	}
+
+	renderRefLine() {
 	}
 
 	renderTemporalLine(line: TemporalLineStruct, temporalLinePosition: number) {
-		const referenceLine = componentFactory.createLine(0, temporalLinePosition, SvgConfig.width, 0, 'black', 2);
+		const referenceLine = componentFactory.createAbsoluteLine(0, temporalLinePosition, SvgConfig.width, 0, 'black', 2);
 		const { chronons } = line;
 		for (let chronon of chronons) {
 			if (chrononIsEvent(chronon)) {
-				this.renderEvent(chronon, referenceLine);
+				this.renderEvent(chronon, referenceLine, temporalLinePosition);
 			} else {
+				this.renderPeriod(chronon as Period, referenceLine, temporalLinePosition);
 			}
 		}
 	}
 
-	renderEvent(event: Event, referenceLine: SVGLineElement) {
+	renderPeriod(period: Period, referenceLine: SVGLineElement, linePosition: number) {
+		console.clear();
+		console.log(referenceLine.getAttribute('y1'));
+		if (typeof period.start === 'object') {
+			this.renderEvent(period.start as Event, referenceLine, linePosition);
+		}
+		const start = (period.start as Event)?.occuring_time || +period.start.toString();
+		const periodPosition = start / Math.abs(+referenceLine.getAttribute('x1') -  +referenceLine.getAttribute('x2')) * 100;
+		const periodHeight = SvgConfig.temporalLineHeight;
+		componentFactory.createAbsoluteBox(periodPosition, linePosition - 80, periodHeight, 8000, 'rgba(255, 0, 0, 0.2)');
+	}
+
+	renderEvent(event: Event, referenceLine: SVGLineElement, linePosition: number) {
 		const { occuring_time } = event;
-		const y1 = +referenceLine.getAttribute('y1');
-		const eventPosition = Math.abs(+referenceLine.getAttribute('x1') -  +referenceLine.getAttribute('x2')) / 2;
+		const y1 = linePosition;
+		const eventPosition = occuring_time / Math.abs(+referenceLine.getAttribute('x1') -  +referenceLine.getAttribute('x2')) * 100;
 		const eventLine = componentFactory.createAbsoluteLine(eventPosition, y1, 40, -90, 'rgba(200, 200, 200, 0.9)', 1, false);
 		const eventLineX2 = +eventLine.getAttribute('x2');
 		const eventLineY2 = +eventLine.getAttribute('y2');
-		const boxHeight = 40;
+		const boxHeight = SvgConfig.eventBoxHeight;
 		const group = hoverable(componentFactory.createAbsoluteGroup(), {
 			in(element) {
 				const [box, line, label] = Array.from(element.children);
