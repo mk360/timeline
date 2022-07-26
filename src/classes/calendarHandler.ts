@@ -147,9 +147,10 @@ class Calendar implements CalendarStruct {
 		else {
 			for (let i = 1; i < this.divisions.length; ++i) {					//- i start at 1 because we can't check for top-level division
 				if (typeof this.divisions[i-1].unitsLength !== 'undefined') {
-					if (Array.isArray(this.divisions[i-1].unitsLength))
+					const currentUnitLength = this.divisions[i-1].unitsLength;
+					if (Array.isArray(currentUnitLength))
 					{
-						if (date[i] < 0 || date[i] > this.divisions[i-1].unitsLength[date[i-1]]) {
+						if (date[i] < 0 || date[i] > currentUnitLength[date[i-1]]) {
 							console.log(date + " is not valid but fuck it is");
 							return false; // tmp
 						}
