@@ -1,13 +1,24 @@
 import ComponentFactory from './classes/component-factory';
 import Timeline from './classes/timelineHandler';
+import Calendar from './classes/calendarHandler';
 import BaseTimelineRenderer from './classes/baseRenderer';
  
 // Exemple d'utilisation (sans offsets)
 
+
+
 let ww2tl = new Timeline();
 ww2tl.addDivision("année", 12);
 console.log(ww2tl.calendar.divisions);
-ww2tl.addDivision("mois", [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"]);
+
+let getFebruaryLength = (cal: Calendar, year: number): number => {
+	if ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0)
+		return 29;
+	else
+		return 28;
+};
+
+ww2tl.addDivision("mois", [31, getFebruaryLength, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"]);
 console.log(ww2tl.calendar.divisions);
 ww2tl.addDivision("jour");
 console.log(ww2tl.calendar.divisions);
