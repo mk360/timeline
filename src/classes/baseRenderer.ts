@@ -54,13 +54,11 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 	}
 
 	renderPeriod(period: Period, referenceLine: SVGLineElement, linePosition: number) {
-		console.clear();
-		console.log(referenceLine.getAttribute('y1'));
 		if (typeof period.start === 'object') {
-			this.renderEvent(period.start as Event, referenceLine, linePosition);
+			this.renderEvent(period.start, referenceLine, linePosition);
 		}
-		const start = (period.start as Event)?.occuring_time || +period.start.toString();
-		const periodPosition = start / Math.abs(+referenceLine.getAttribute('x1') -  +referenceLine.getAttribute('x2')) * 100;
+
+		const periodPosition = period.start / Math.abs(+referenceLine.getAttribute('x1') -  +referenceLine.getAttribute('x2')) * 100;
 		const periodHeight = SvgConfig.temporalLineHeight;
 		componentFactory.createAbsoluteBox(periodPosition, linePosition - 80, periodHeight, 8000, 'rgba(255, 0, 0, 0.2)');
 	}
