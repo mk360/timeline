@@ -133,6 +133,42 @@ class Calendar implements CalendarStruct {
 		return elapsedTime;
 	};
 
+	/**
+	 * Verifies that the date inputed is correct in the current calendar
+	 * @method isDateValid
+	 * @param {number[]} date - The date to check
+	 * @returns {boolean} - true if the date is correct, false otherwise
+	 */
+	isDateValid(date: number[]): boolean {
+		if (date.length !== this.divisions.length) {
+			console.log(date + " is not valid 1");
+			return false;
+		}
+		else {
+			for (let i = 1; i < this.divisions.length; ++i) {					//- i start at 1 because we can't check for top-level division
+				if (typeof this.divisions[i-1].unitsLength !== 'undefined') {
+					if (Array.isArray(this.divisions[i-1].unitsLength))
+					{
+						if (date[i] < 0 || date[i] > this.divisions[i-1].unitsLength[date[i-1]]) {
+							console.log(date + " is not valid but fuck it is");
+							return false; // tmp
+						}
+					}
+					else {
+						if (date[i] < 0 || date[i] > this.divisions[i-1].unitsLength) {
+							console.log(date + " is not valid 3");
+							return false;
+						}
+					}
+
+				}
+
+			}
+
+		}
+
+		return true;
+	};
 
 	/**
 	 * Prints the conversion table as a matrix
