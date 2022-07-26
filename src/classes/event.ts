@@ -1,7 +1,6 @@
 import EventStruct from '../interfaces/event';
 
 class Event implements EventStruct {
-	id: number;
 	name: string;
 	desc?: string;
 	occuring_time: number;
