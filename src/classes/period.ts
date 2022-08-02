@@ -54,12 +54,12 @@ class Period implements PeriodStruct {
 	 * @param {boolean} [putAtEnd=false] - A boolean flag used if the date parameter is a Period. If putAtEnd is true, the added event will use the ending date of the Period (it will be put at the end of the period). Otherwise, it's the starting date of the Period that will be used
 	 * @returns {Event} - The newly-created event 
 	 */
-	addEvent(name: string, date: number | number[] | Chronon, putAtEnd:boolean = false): Event {
+	addEvent(name: string, date: number | number[] | Chronon, putAtEnd :boolean, offset?: number | number[]): Event {
 		/*if !isDateValid(date)
 			throw error;*/
-
+		const offsetValue = offset ? (typeof offset === 'number' ? offset : this.computeDate(offset, false)) : 0;
 		let _date: number = typeof date === 'number' ? date : this.computeDate(date, putAtEnd);
-		let newEvent = new Event(name, _date);
+		let newEvent = new Event(name, _date + offsetValue);
 		this.sub_chronons.push(newEvent);
 
 		return newEvent;

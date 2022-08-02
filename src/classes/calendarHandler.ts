@@ -5,7 +5,7 @@
 
 import CalendarStruct from '../interfaces/calendar'
 import Division from '../interfaces/division'
-import { Vector, Matrix } from 'ts-matrix';
+import { Matrix } from 'ts-matrix';
 
 /* ===CALENDAR NOTES
 
