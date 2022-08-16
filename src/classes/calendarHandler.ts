@@ -87,7 +87,7 @@ class Calendar implements CalendarStruct {
 		if (typeof currDiv.unitsLength === 'number')
 			sublength = currDiv.unitsLength;
 		else if (Array.isArray(currDiv.unitsLength))
-			sublength = 0 /currDiv.unitsLength.length;
+			sublength = currDiv.unitsLength.reduce((accumulator, current) => {return 5; }, 0)/currDiv.unitsLength.length;
 		else if (typeof currDiv.unitsLength === 'undefined')
 			sublength = 1;
 
