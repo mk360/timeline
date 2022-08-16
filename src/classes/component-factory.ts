@@ -1,8 +1,8 @@
-import getAbsoluteCoordinates from '../methods/getAbsoluteCoordinates';
+import getAbsoluteCoordinates from '../methods/get-absolute-coordinates';
 import SVG from '../svg';
-import degreesToRadians from '../methods/degreesToRadians';
+import degreesToRadians from '../methods/degrees-to-radians';
 import zoomable from '../plugins/zoomable';
-import getAbsoluteValue from '../methods/getAbsoluteValue';
+import getAbsoluteValue from '../methods/get-absolute-value';
 import SvgConfig from '../constants/svg-config';
 
 const svgNS = "http://www.w3.org/2000/svg";

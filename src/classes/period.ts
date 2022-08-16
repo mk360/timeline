@@ -7,6 +7,7 @@ import PeriodStruct from '../interfaces/period';
 import Chronon from '../interfaces/chronon';
 import Event from './event';
 import Calendar from './calendarHandler';
+import PeriodAddingOptions from '../interfaces/period-adding-options';
 
 /**
  * Class handling everything related to periods
@@ -76,15 +77,14 @@ class Period implements PeriodStruct {
 	 * @param {boolean} [startAtEnd=true] - A boolean flag used if the end parameter is a Period. If startAtEnd is true, the added period will use the ending date of the period parameter (it will be put at the end of the period). Otherwise, it's the starting date of the period parameter that will be used
 	 * @returns {Period} - The newly-created period 
 	 */
-	addPeriod(name: string, start: number | number[] | Chronon, end?: number | number[] | Chronon, desc?: string, endAtStart: boolean = true, startAtEnd: boolean = true): Period {	
+	addPeriod(options: PeriodAddingOptions): Period {	
 		/*if (!isDateValid(start) or !isDateValid(end) 
 			throw error;*/
-
 		let _start, _end: number;
-		_start = typeof start === 'number' ? start : this.computeDate(start, endAtStart);
-		_end = typeof end === 'number' ? end : this.computeDate(end, startAtEnd);
+		_start = typeof options.start.date === 'number' ? options.start.date : this.computeDate(options.start.date, options.start.useEndOfPeriod);
+		_end = typeof options.end.date === 'number' ? options.end.date : this.computeDate(options.end.date, options.end.useEndOfPeriod);
 
-		let newPeriod = new Period(name, _start, _end, this.refCalendar, this.startingPoint);
+		let newPeriod = new Period(options.name, _start, _end, this.refCalendar, this.startingPoint);
 		this.sub_chronons.push(newPeriod);
 
 		return newPeriod;

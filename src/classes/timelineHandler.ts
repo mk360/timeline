@@ -42,7 +42,7 @@ class Timeline implements TimelineStruct {
 	 * @param {(number|number[])} [unitsLength] - The number of units in which this division is subdivided (for exemple, 12 for a year divided in months). A number[] indicates that the division is irregularily subdivided (like months whose number of days depends of said month)
 	 * @param {string[]} [unitsNames] - The names for the division's units (for exemple, the months' names for a month division)
 	 */
-	addDivision(name: string, unitsLength?: number | number[], unitsNames?: string[]): void {
+	addDivision(name: string, unitsLength?: number | (number | ((c: Calendar, x: number) => number))[], unitsNames?: string[]): void {
 		this.calendar.addDivision(new Division(name, unitsLength, unitsNames));
 	};
 

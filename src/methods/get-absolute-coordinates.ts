@@ -1,6 +1,6 @@
 import SvgConfig from "../constants/svg-config";
 import SvgCoordinates from "../interfaces/svg-coordinate";
-import getAbsoluteValue from './getAbsoluteValue';
+import getAbsoluteValue from './get-absolute-value';
 
 /**
  * Calculate absolute coordinates depending on the configured

@@ -1,4 +1,5 @@
 import SvgConfig from "./constants/svg-config";
+import pannable from './plugins/pannable';
 
 const svgId = 'svg';
 
@@ -7,4 +8,4 @@ document.body.innerHTML += svgString;
 const SVG = document.getElementById(svgId)! as HTMLObjectElement;
 SVG.style.border = "1px solid black";
 
-export default SVG;
+export default pannable(SVG);

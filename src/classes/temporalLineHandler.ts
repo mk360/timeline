@@ -8,6 +8,7 @@ import Chronon from '../interfaces/chronon';
 import Calendar from './calendarHandler';
 import Event from './event';
 import Period from './period';
+import PeriodAddingOptions from '../interfaces/period-adding-options';
 
 /**
  * Class handling temporal lines
@@ -57,23 +58,17 @@ class TemporalLine implements TemporalLineStructure {
 	/**
 	 * Adds a new Period to the temporal line if the dates are valid, throws an error otherwise
 	 * @method addPeriod
-	 * @param {string} name - The name of the event
-	 * @param {(number|number[]|Chronon)} start - The date at which the period started. If it's a number[], the time elapsed since timeline's starting point is computed. If it's a Chronon, the Chronon's internal date is used
-	 * @param {(number|number[]|Chronon)} end - The date at which the period ended. If it's a number[], the time elapsed since timeline's starting point is computed. If it's a Chronon, the Chronon's internal date is used
-	 * @param {string} [desc] - A description of the period
-	 * @param {boolean} [endAtStart=true] - A boolean flag used if the start parameter is a Period. If endAtStart is true, the added period will use the ending date of the period parameter (it will be put at the end of the period). Otherwise, it's the starting date of the period parameter that will be used
-	 * @param {boolean} [startAtEnd=true] - A boolean flag used if the end parameter is a Period. If startAtEnd is true, the added period will use the ending date of the period parameter (it will be put at the end of the period). Otherwise, it's the starting date of the period parameter that will be used
-	 * @returns {Period} - The newly-created period 
+	 * @param {PeriodAddingOptions} options Period configuration options
 	 */
-	addPeriod(name: string, start: number | number[] | Chronon, end?: number | number[] | Chronon, desc?: string, endAtStart: boolean = true, startAtEnd: boolean = true) {	
+	addPeriod(options: PeriodAddingOptions) {	
 		/*if (!isDateValid(start) or !isDateValid(end) 
 			throw error;*/
 
 		let _start, _end: number;
-		_start = typeof start === 'number' ? start : this.computeDate(start, endAtStart);
-		_end = typeof end === 'number' ? end : this.computeDate(end, startAtEnd);
+		_start = typeof options.start.date === 'number' ? options.start.date : this.computeDate(options.start.date, options.start.useEndOfPeriod);
+		_end = typeof options.end.date === 'number' ? options.end.date : this.computeDate(options.end.date, options.end.useEndOfPeriod);
 
-		let newPeriod = new Period(name, _start, _end, this.refCalendar, this.startingPoint, desc);
+		let newPeriod = new Period(options.name, _start, _end, this.refCalendar, this.startingPoint, options.description);
 		this.chronons.push(newPeriod);
 
 		return newPeriod;
