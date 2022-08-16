@@ -9,7 +9,7 @@ import Timeline from './timelineHandler';
 import Period from './period';
 
 function* getNextPositionMultiplier() {
-	let multiplier = 0;
+	let multiplier = -1;
 
 	while (true) {
 		yield multiplier;
@@ -42,14 +42,24 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 	}
 
 	renderTemporalLine(line: TemporalLineStruct, temporalLinePosition: number) {
-		const referenceLine = componentFactory.createAbsoluteLine(0, temporalLinePosition, SvgConfig.width, 0, 'black', 2);
+		const referenceLine = componentFactory.createAbsoluteLine(0, temporalLinePosition, Number.MAX_SAFE_INTEGER, 0, 'black', 2);
 		const { chronons } = line;
+		const events: Event[] = [];
+		const periods: Period[] = [];
 		for (let chronon of chronons) {
 			if (chrononIsEvent(chronon)) {
-				this.renderEvent(chronon, referenceLine, temporalLinePosition);
+				events.push(chronon);
 			} else {
-				this.renderPeriod(chronon as Period, referenceLine, temporalLinePosition);
+				periods.push(chronon as Period);
 			}
+		}
+
+		for (let period of periods) {
+			this.renderPeriod(period, referenceLine, temporalLinePosition);
+		}
+
+		for (let event of events) {
+			this.renderEvent(event, referenceLine, temporalLinePosition);
 		}
 	}
 
