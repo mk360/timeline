@@ -1,11 +1,8 @@
-import ComponentFactory from './classes/component-factory';
 import Timeline from './classes/timelineHandler';
 import Calendar from './classes/calendarHandler';
 import BaseTimelineRenderer from './classes/baseRenderer';
  
 // Exemple d'utilisation (sans offsets)
-
-
 
 let ww2tl = new Timeline();
 ww2tl.addDivision("année", 12);
@@ -28,8 +25,14 @@ console.log(ww2tl.startingPoint);
 
 let germanyTpl = ww2tl.addTemporalLine("Allemagne");
 console.log(ww2tl.temporalLines);
-let evntHitlerChancelier = germanyTpl.addEvent("Adolf Hitler est nommé chancelier du Reich", [1933, 1, 30]);
-let evntArrestationDonitz = germanyTpl.addEvent("Arrestation de Karl Dönitz", [1945, 5, 23]);
+let evntHitlerChancelier = germanyTpl.addEvent({
+	name: "Adolf Hitler est nommé chancelier du Reich", 
+	date: [1933, 1, 30]
+});
+let evntArrestationDonitz = germanyTpl.addEvent({
+	name: "Arrestation de Karl Dönitz", 
+	date: [1945, 5, 23]
+});
 let thirdReichPeriod = germanyTpl.addPeriod({
 	name: "Troisième Reich", 
 	start: {
@@ -40,15 +43,29 @@ let thirdReichPeriod = germanyTpl.addPeriod({
 	}
 });
 
-let evntIncendieReichstag = germanyTpl.addEvent("Incendie du Reichstag", [1933, 2, 27]);
+let evntIncendieReichstag = germanyTpl.addEvent({
+	name: "Incendie du Reichstag",
+	date: [1933, 2, 27]
+});
 
-// let perGleichschaltung = thirdReichPeriod.addPeriod("Gleichschaltung", [1933, 2, 28], [1934, 8, 19]);
+let perGleichschaltung = thirdReichPeriod.addPeriod({
+	name: "Gleichschaltung", 
+	start: {
+		date: [1933, 2, 28], 
+	},
+	end: {
+		date: [1934, 8, 19]
+	}
+});
 // perGleichschaltung.addEvent("Adolf Hitler obtient les pleins pouvoirs", [1933, 3, 23]);
 
 // germanyTpl.addPeriod({"Allemange occupée", thirdReichPeriod.end);
 
 let tplEasternFront = ww2tl.addTemporalLine("Front de l'Est");
-let evntInvasionPologne = tplEasternFront.addEvent("Invasion de la Pologne", [1939, 9, 1]);
+let evntInvasionPologne = tplEasternFront.addEvent({
+	name: "Invasion de la Pologne", 
+	date: [1939, 9, 1]
+});
 tplEasternFront.addPeriod({
 	name: "Campagne de Pologne",
 	start: {
@@ -60,7 +77,10 @@ tplEasternFront.addPeriod({
 }); //temps absolu et temps relatif
 
 let tplJapan = ww2tl.addTemporalLine("Japon");
-let evntCapitulationJapon = tplJapan.addEvent("Capitulation du Japon", [1945, 7, 2]);
+let evntCapitulationJapon = tplJapan.addEvent({
+	name: "Capitulation du Japon", 
+	date: [1945, 7, 2]
+});
 
 let tplGlobalEvents = ww2tl.addTemporalLine("Évènements généraux");
 tplGlobalEvents.addPeriod({
@@ -72,6 +92,10 @@ tplGlobalEvents.addPeriod({
 		date: evntCapitulationJapon
 	}
 });
-tplGlobalEvents.addEvent("Ouverture de la Conférence de Potsdam", [1945, 7, 17]);
+
+tplGlobalEvents.addEvent({
+	name: "Ouverture de la Conférence de Potsdam", 
+	date: [1945, 7, 17]
+});
 
 new BaseTimelineRenderer().render(ww2tl);

@@ -8,6 +8,7 @@ import Chronon from '../interfaces/chronon';
 import Event from './event';
 import Calendar from './calendarHandler';
 import PeriodAddingOptions from '../interfaces/period-adding-options';
+import EventAddingOptions from '../interfaces/event-adding-options';
 
 /**
  * Class handling everything related to periods
@@ -49,18 +50,15 @@ class Period implements PeriodStruct {
 	/**
 	 * Adds a new Event to the temporal line if the date is valid, throws an error otherwise
 	 * @method addEvent
-	 * @param {string} name - The name of the event
-	 * @param {(number|number[]|Chronon)} date - The date at which the event occurred. If it's a number[], the time elapsed since timeline's starting point is computed. If it's a Chronon, the Chronon's internal date is used
-	 * @param {string} [desc] - A description of the event
-	 * @param {boolean} [putAtEnd=false] - A boolean flag used if the date parameter is a Period. If putAtEnd is true, the added event will use the ending date of the Period (it will be put at the end of the period). Otherwise, it's the starting date of the Period that will be used
+	 * @param {EventAddingOptions} options Event adding options (name, date, offset).
 	 * @returns {Event} - The newly-created event 
 	 */
-	addEvent(name: string, date: number | number[] | Chronon, putAtEnd :boolean, offset?: number | number[]): Event {
+	addEvent(options: EventAddingOptions): Event {
 		/*if !isDateValid(date)
 			throw error;*/
-		const offsetValue = offset ? (typeof offset === 'number' ? offset : this.computeDate(offset, false)) : 0;
-		let _date: number = typeof date === 'number' ? date : this.computeDate(date, putAtEnd);
-		let newEvent = new Event(name, _date + offsetValue);
+		const offsetValue = options.offset ? (typeof options.offset === 'number' ? options.offset : this.computeDate(options.offset, false)) : 0;
+		let _date: number = typeof options.date === 'number' ? options.date : this.computeDate(options.date, options.putAtEnd);
+		let newEvent = new Event(options.name, _date + offsetValue);
 		this.sub_chronons.push(newEvent);
 
 		return newEvent;

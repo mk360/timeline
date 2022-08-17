@@ -1,6 +1,4 @@
-import ChrononStruct from './chronon';
-
-type TimelineDate = number | ChrononStruct | number[];
+import TimelineDate from '../types/timeline-date';
 
 interface PeriodAddingOptions {
     name: string;
