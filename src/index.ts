@@ -57,7 +57,10 @@ let perGleichschaltung = thirdReichPeriod.addPeriod({
 		date: [1934, 8, 19]
 	}
 });
-// perGleichschaltung.addEvent("Adolf Hitler obtient les pleins pouvoirs", [1933, 3, 23]);
+perGleichschaltung.addEvent({
+	name: "Adolf Hitler obtient les pleins pouvoirs", 
+	date: [1933, 3, 23]
+});
 
 // germanyTpl.addPeriod({"Allemange occupée", thirdReichPeriod.end);
 

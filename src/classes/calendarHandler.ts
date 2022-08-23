@@ -64,6 +64,14 @@ class Calendar implements CalendarStruct {
 		this.printConvTable();
 	};
 
+	private getDivisionLength(unit: number | ((calendar: Calendar, length: number) => number)) {
+		if (typeof unit === 'number') {
+			return unit;
+		}
+
+		return unit(this, 2000);
+	}
+
 	/**
 	 * Computes the conversion rate between 2 divisions of the calendar
 	 * @private
@@ -86,9 +94,12 @@ class Calendar implements CalendarStruct {
 
 		if (typeof currDiv.unitsLength === 'number')
 			sublength = currDiv.unitsLength;
-		else if (Array.isArray(currDiv.unitsLength))
-			sublength = currDiv.unitsLength.reduce((accumulator, current) => {return 5; }, 0)/currDiv.unitsLength.length;
-		else if (typeof currDiv.unitsLength === 'undefined')
+		else if (Array.isArray(currDiv.unitsLength)) {
+			const depthLength = currDiv.unitsLength.reduce<number>((accumulator, current) => {
+				return this.getDivisionLength(accumulator) + this.getDivisionLength(current);
+			}, 0);
+			sublength = depthLength / currDiv.unitsLength.length;
+		} else if (typeof currDiv.unitsLength === 'undefined')
 			sublength = 1;
 
 		if (this.divisions[deepness+1].unitsLength !== undefined) {
