@@ -1,0 +1,23 @@
+#timeline-svg {
+    .event-line {
+        transition: fill 0.1s linear;
+        fill: rgba(200, 200, 200, 0.9);
+    }
+
+    .event-box {
+        transition-property: fill, width;
+        transition-timing-function: linear, cubic-bezier(0.55, 0, 1, 0.45);
+        transition-duration: 0.2s, 0.4s;
+        fill: rgba(200, 200, 200, 0.9);
+    }
+
+    .event-group:hover {
+        .event-line, .event-box {
+            fill: red;
+        }
+
+        .event-box {
+            width: 100%;
+        }
+    }
+}

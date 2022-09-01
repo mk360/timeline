@@ -110,15 +110,12 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		const group = hoverable(componentFactory.createAbsoluteGroup(), {
 			in(element) {
 				const [box, line, label] = Array.from(element.children);
-				box.setAttribute('fill', 'red');
-				line.setAttribute('style', 'stroke:red;stroke-width:1');
 			},
 			out(element) {
 				const [box, line, label] = Array.from(element.children);
-				box.setAttribute('fill', 'rgba(200, 200, 200, 0.9)');
-				line.setAttribute('style', 'stroke:rgba(200, 200, 200, 0.9); stroke-width:1');
 			}
 		});
+		group.classList.add('event-group');
 		const eventBox = componentFactory.createAbsoluteBox(+eventLine.getAttribute('x1') - 1, eventLineY2 - boxHeight / 2, boxHeight, boxHeight * 2, 'rgba(200, 200, 200, 0.9)', false);
 		eventBox.classList.add('event-box');
 		const eventLabel = componentFactory.createAbsoluteText(+eventBox.getAttribute('x') + 4, +eventBox.getAttribute('y') + 17, event.name, 16, 'black', false);

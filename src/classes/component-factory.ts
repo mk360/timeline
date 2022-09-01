@@ -4,6 +4,7 @@ import degreesToRadians from '../methods/degrees-to-radians';
 import zoomable from '../plugins/zoomable';
 import getAbsoluteValue from '../methods/get-absolute-value';
 import SvgConfig from '../constants/svg-config';
+import '../css/index.scss';
 
 const svgNS = "http://www.w3.org/2000/svg";
 const group = zoomable(document.createElementNS(svgNS, 'g'));
@@ -92,8 +93,9 @@ class ComponentFactory {
         const x2 = x + length * Math.cos(radians);
         const y2 = y + length * Math.sin(radians);
         line.setAttribute('x2', x2.toString());
+        line.setAttribute('stroke', color);
+        line.setAttribute('stroke-width', strokeWidth.toString());
         line.setAttribute('y2', y2.toString());
-        line.setAttribute('style', `stroke:${color};stroke-width:${strokeWidth}`);
 
         if (appendToSVG) {
             this.appendToSVG(line);
