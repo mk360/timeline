@@ -7,6 +7,7 @@ import Event from './event';
 import Timeline from './timelineHandler';
 import Period from './period';
 import chrononIsEvent from '../methods/chronon-is-event';
+import getChrononStart from '../methods/get-chronon-start';
 
 function* getNextPositionMultiplier() {
 	let multiplier = -1;
@@ -54,31 +55,33 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 			}
 		}
 
+		let eventRenderPosition = 0;
+		let periodRenderPosition = 0;
+
 		for (let period of periods) {
-			this.renderPeriod(period, referenceLine, temporalLinePosition);
+			periodRenderPosition += getChrononStart(period);
+			this.renderPeriod(period, referenceLine, temporalLinePosition, periodRenderPosition);
 		}
 
 		for (let event of events) {
-			this.renderEvent(event, referenceLine, temporalLinePosition);
+			eventRenderPosition = eventRenderPosition + Math.abs(getChrononStart(event) - eventRenderPosition);
+			this.renderEvent(event, referenceLine, temporalLinePosition, eventRenderPosition);
 		}
 	}
 
-	renderPeriod(period: Period, referenceLine: SVGLineElement, linePosition: number) {
+	renderPeriod(period: Period, referenceLine: SVGLineElement, linePosition: number, position: number) {
 		if (typeof period.start === 'object') {
-			this.renderEvent(period.start, referenceLine, linePosition);
+			this.renderEvent(period.start, referenceLine, linePosition, position);
 		}
 
 		const periodPosition = period.start / Math.abs(+referenceLine.getAttribute('x1') -  +referenceLine.getAttribute('x2')) * 100;
 		const periodHeight = SvgConfig.temporalLineHeight;
-		componentFactory.createAbsoluteBox(periodPosition, linePosition - 80, periodHeight, 8000, 'rgba(255, 0, 0, 0.2)');
+		componentFactory.createAbsoluteBox(position, linePosition - 80, periodHeight, 8000, 'rgba(255, 0, 0, 0.2)');
 	}
 
-	renderEvent(event: Event, referenceLine: SVGLineElement, linePosition: number) {
-		const { occuring_time } = event;
+	renderEvent(event: Event, referenceLine: SVGLineElement, linePosition: number, renderPosition: number) {
 		const y1 = linePosition;
-		const eventPosition = occuring_time / Math.abs(+referenceLine.getAttribute('x1') -  +referenceLine.getAttribute('x2')) * 100;
-		const eventLine = componentFactory.createAbsoluteLine(eventPosition, y1, 40, -90, 'rgba(200, 200, 200, 0.9)', 1, false);
-		const eventLineX2 = +eventLine.getAttribute('x2');
+		const eventLine = componentFactory.createAbsoluteLine(renderPosition / 20, y1, 40, -90, 'rgba(200, 200, 200, 0.9)', 1, false);
 		const eventLineY2 = +eventLine.getAttribute('y2');
 		const boxHeight = SvgConfig.eventBoxHeight;
 		const group = hoverable(componentFactory.createAbsoluteGroup(), {
@@ -93,7 +96,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 				line.setAttribute('style', 'stroke:rgba(200, 200, 200, 0.9); stroke-width:1');
 			}
 		});
-		const eventBox = componentFactory.createAbsoluteBox(eventLineX2 - 1, eventLineY2 - boxHeight / 2, boxHeight, boxHeight * 2, 'rgba(200, 200, 200, 0.9)', false);
+		const eventBox = componentFactory.createAbsoluteBox(+eventLine.getAttribute('x1') - 1, eventLineY2 - boxHeight / 2, boxHeight, boxHeight * 2, 'rgba(200, 200, 200, 0.9)', false);
 		const eventLabel = componentFactory.createAbsoluteText(+eventBox.getAttribute('x') + 4, +eventBox.getAttribute('y') + 17, event.name, 16, 'black', false);
 		group.append(eventBox, eventLine, eventLabel);
 		eventBox.setAttribute('width', `${eventLabel.getBBox().width + 10}px`);
