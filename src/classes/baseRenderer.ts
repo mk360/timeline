@@ -1,5 +1,4 @@
 import SvgConfig from '../constants/svg-config';
-import Chronon from '../interfaces/chronon';
 import hoverable from '../plugins/hoverable';
 import TemporalLineStruct from '../interfaces/temporalLine';
 import AbsTimelineRenderer from './abstractRenderer';
@@ -7,6 +6,7 @@ import componentFactory from './component-factory';
 import Event from './event';
 import Timeline from './timelineHandler';
 import Period from './period';
+import chrononIsEvent from '../methods/chronon-is-event';
 
 function* getNextPositionMultiplier() {
 	let multiplier = -1;
@@ -98,10 +98,6 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		group.append(eventBox, eventLine, eventLabel);
 		eventBox.setAttribute('width', `${eventLabel.getBBox().width + 10}px`);
 	}
-}
-
-function chrononIsEvent(chronon: Chronon): chronon is Event {
-	return 'occuring_time' in chronon;
 }
 
 export default BaseTimelineRenderer
