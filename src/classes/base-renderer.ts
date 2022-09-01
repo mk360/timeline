@@ -49,7 +49,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 			const computedYear = i + yr;
 			const renderPosition = this.tl.calendar.getElapsedTime([computedYear, 1, 1]) - this.tl.calendar.getElapsedTime([yr, 1, 1]);
 			const notch = componentFactory.createAbsoluteBox(renderPosition, +line.getAttribute('y1') - 5, 10, 1, 'black');
-			const yearLabel = componentFactory.createAbsoluteText(+notch.getAttribute('x') - 1, +notch.getAttribute('y') - 5, computedYear.toString(), 10, 'black');
+			const yearLabel = componentFactory.createAbsoluteText(+notch.getAttribute('x') - 10, +notch.getAttribute('y') - 5, computedYear.toString(), 10, 'black');
 		}
 	}
 
