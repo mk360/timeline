@@ -1,5 +1,5 @@
 import DivisionStruct from '../interfaces/division'
-import Calendar from './calendarHandler'
+import Calendar from './calendar-handler'
 
 /**
  * @implements DivisionStruct

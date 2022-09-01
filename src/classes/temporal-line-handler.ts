@@ -5,7 +5,7 @@
 
 import TemporalLineStructure from '../interfaces/temporalLine';
 import Chronon from '../interfaces/chronon';
-import Calendar from './calendarHandler';
+import Calendar from './calendar-handler';
 import Event from './event';
 import Period from './period';
 import PeriodAddingOptions from '../interfaces/period-adding-options';

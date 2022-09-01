@@ -2,7 +2,7 @@
  * @module {DivisionStruct} Division
  */
 
-import Calendar from "../classes/calendarHandler";
+import Calendar from "../classes/calendar-handler";
 
 /**
  * An interface storing the information needed for a division

@@ -5,9 +5,9 @@
 
 import TimelineStruct from '../interfaces/timeline';
 import Division from './division';
-import Calendar from './calendarHandler';
-import TemporalLine from './temporalLineHandler';
-import AbsTimelineRenderer from './abstractRenderer';
+import Calendar from './calendar-handler';
+import TemporalLine from './temporal-line-handler';
+import AbsTimelineRenderer from './abstract-renderer';
 
 /**
  * Handles a timeline, ie, a collection of temporal lines referencing chronons according to a calendar

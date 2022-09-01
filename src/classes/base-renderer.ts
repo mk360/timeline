@@ -1,10 +1,10 @@
 import SvgConfig from '../constants/svg-config';
 import hoverable from '../plugins/hoverable';
 import TemporalLineStruct from '../interfaces/temporalLine';
-import AbsTimelineRenderer from './abstractRenderer';
+import AbsTimelineRenderer from './abstract-renderer';
 import componentFactory from './component-factory';
 import Event from './event';
-import Timeline from './timelineHandler';
+import Timeline from './timeline-handler';
 import Period from './period';
 import chrononIsEvent from '../methods/chronon-is-event';
 import getChrononStart from '../methods/get-chronon-start';
@@ -66,7 +66,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 
 		for (let event of events) {
 			eventRenderPosition += Math.abs(getChrononStart(event) - eventRenderPosition);
-			this.renderEvent(event, referenceLine, temporalLinePosition, eventRenderPosition);
+			this.renderEvent(event, temporalLinePosition, eventRenderPosition);
 		}
 	}
 
@@ -82,9 +82,10 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		componentFactory.createAbsoluteBox(position, linePosition - 80, periodHeight, periodDuration, 'rgba(255, 0, 0, 0.2)');
 	}
 
-	renderEvent(event: Event, referenceLine: SVGLineElement, linePosition: number, renderPosition: number) {
+	renderEvent(event: Event, linePosition: number, renderPosition: number) {
 		const y1 = linePosition;
 		const eventLine = componentFactory.createAbsoluteLine(renderPosition / 20, y1, 40, -90, 'rgba(200, 200, 200, 0.9)', 1, false);
+		eventLine.classList.add('event-line');
 		const eventLineY2 = +eventLine.getAttribute('y2');
 		const boxHeight = SvgConfig.eventBoxHeight;
 		const group = hoverable(componentFactory.createAbsoluteGroup(), {
@@ -100,7 +101,9 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 			}
 		});
 		const eventBox = componentFactory.createAbsoluteBox(+eventLine.getAttribute('x1') - 1, eventLineY2 - boxHeight / 2, boxHeight, boxHeight * 2, 'rgba(200, 200, 200, 0.9)', false);
+		eventBox.classList.add('event-box');
 		const eventLabel = componentFactory.createAbsoluteText(+eventBox.getAttribute('x') + 4, +eventBox.getAttribute('y') + 17, event.name, 16, 'black', false);
+		eventLabel.classList.add('event-label');
 		group.append(eventBox, eventLine, eventLabel);
 		eventBox.setAttribute('width', `${eventLabel.getBBox().width + 10}px`);
 	}

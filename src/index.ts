@@ -1,6 +1,6 @@
-import Timeline from './classes/timelineHandler';
-import Calendar from './classes/calendarHandler';
-import BaseTimelineRenderer from './classes/baseRenderer';
+import Timeline from './classes/timeline-handler';
+import Calendar from './classes/calendar-handler';
+import BaseTimelineRenderer from './classes/base-renderer';
  
 // Exemple d'utilisation (sans offsets)
 
