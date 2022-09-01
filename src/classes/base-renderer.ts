@@ -36,10 +36,29 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 			this.renderTemporalLine(line, temporalLinePosition);
 			temporalLinePosition *= this.positionMultiplier.next().value;
 		}
-		this.renderRefLine();
+
+		this.renderReferenceLine();
 	}
 
-	renderRefLine() {
+	renderReferenceLine() {
+		const linePosition = SvgConfig.height / 1.5;
+		const line = componentFactory.createAbsoluteLine(0, linePosition, Number.MAX_SAFE_INTEGER, 0, 'black', 1);
+		const yr = this.getYear(this.tl.startingPoint);
+
+		for (let i = 0; i < yr; i++) {
+			const computedYear = i + yr;
+			const renderPosition = this.tl.calendar.getElapsedTime([computedYear, 1, 1]) - this.tl.calendar.getElapsedTime([yr, 1, 1]);
+			const notch = componentFactory.createAbsoluteBox(renderPosition, +line.getAttribute('y1') - 5, 10, 1, 'black');
+			const yearLabel = componentFactory.createAbsoluteText(+notch.getAttribute('x') - 1, +notch.getAttribute('y') - 5, computedYear.toString(), 10, 'black');
+		}
+	}
+
+	getYear(timelinePoint: number) {
+		const yearZero = this.tl.calendar.getElapsedTime([1, 1, 1], false);
+		const yearOne = this.tl.calendar.getElapsedTime([2, 1, 1], false);
+		const yearOffset = yearOne - yearZero;
+
+		return Math.floor(timelinePoint / yearOffset);
 	}
 
 	renderTemporalLine(line: TemporalLineStruct, temporalLinePosition: number) {
@@ -56,16 +75,16 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 			}
 		}
 
-		let eventRenderPosition = 0;
-		let periodRenderPosition = 0;
+		let eventRenderPosition = this.tl.startingPoint;
+		let periodRenderPosition = this.tl.startingPoint;
 
 		for (let period of periods) {
-			periodRenderPosition += Math.abs(getChrononStart(period) - periodRenderPosition);
+			periodRenderPosition += getChrononStart(period) - this.tl.startingPoint;
 			this.renderPeriod(period, referenceLine, temporalLinePosition, periodRenderPosition);
 		}
 
 		for (let event of events) {
-			eventRenderPosition += Math.abs(getChrononStart(event) - eventRenderPosition);
+			eventRenderPosition += getChrononStart(event) - this.tl.startingPoint;
 			this.renderEvent(event, temporalLinePosition, eventRenderPosition);
 		}
 	}

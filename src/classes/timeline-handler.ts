@@ -14,7 +14,7 @@ import AbsTimelineRenderer from './abstract-renderer';
  * @implements {TimelineStruct}
  */
 class Timeline implements TimelineStruct {
-	/** @member {Calendar} calendar - The calendar refernce to keep track of chronons' position in time */
+	/** @member {Calendar} calendar - The calendar reference to keep track of chronons' position in time */
 	calendar: Calendar = new Calendar();
 	/** @member {TemporalLine[]} temporalLines - The list of temporal lines in the timeline */
 	temporalLines: TemporalLine[];
@@ -53,7 +53,6 @@ class Timeline implements TimelineStruct {
 	setStartingPoint(divValues: number[]): void;
 	setStartingPoint(timeElapsed: number): void;	//time elapsed since 01/01/0001 ou whatever équivalent dans le calendrier
 	setStartingPoint(time: any): void {
-		//this.calendar.setStartingPoint(time);
 
 		if (Array.isArray(time))
 			this.startingPoint = this.calendar.getElapsedTime(time);
