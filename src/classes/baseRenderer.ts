@@ -47,6 +47,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		const { chronons } = line;
 		const events: Event[] = [];
 		const periods: Period[] = [];
+
 		for (let chronon of chronons) {
 			if (chrononIsEvent(chronon)) {
 				events.push(chronon);
@@ -59,24 +60,26 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		let periodRenderPosition = 0;
 
 		for (let period of periods) {
-			periodRenderPosition += getChrononStart(period);
+			periodRenderPosition += Math.abs(getChrononStart(period) - periodRenderPosition);
 			this.renderPeriod(period, referenceLine, temporalLinePosition, periodRenderPosition);
 		}
 
 		for (let event of events) {
-			eventRenderPosition = eventRenderPosition + Math.abs(getChrononStart(event) - eventRenderPosition);
+			eventRenderPosition += Math.abs(getChrononStart(event) - eventRenderPosition);
 			this.renderEvent(event, referenceLine, temporalLinePosition, eventRenderPosition);
 		}
 	}
 
 	renderPeriod(period: Period, referenceLine: SVGLineElement, linePosition: number, position: number) {
-		if (typeof period.start === 'object') {
-			this.renderEvent(period.start, referenceLine, linePosition, position);
+		for (let chronon of period.sub_chronons) {
+			if (chronon instanceof Period) {
+				this.renderPeriod(chronon, referenceLine, linePosition, position);
+			}
 		}
 
-		const periodPosition = period.start / Math.abs(+referenceLine.getAttribute('x1') -  +referenceLine.getAttribute('x2')) * 100;
+		const periodDuration = period.end - period.start;
 		const periodHeight = SvgConfig.temporalLineHeight;
-		componentFactory.createAbsoluteBox(position, linePosition - 80, periodHeight, 8000, 'rgba(255, 0, 0, 0.2)');
+		componentFactory.createAbsoluteBox(position, linePosition - 80, periodHeight, periodDuration, 'rgba(255, 0, 0, 0.2)');
 	}
 
 	renderEvent(event: Event, referenceLine: SVGLineElement, linePosition: number, renderPosition: number) {
