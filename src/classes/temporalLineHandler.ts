@@ -10,7 +10,7 @@ import Event from './event';
 import Period from './period';
 import PeriodAddingOptions from '../interfaces/period-adding-options';
 import EventAddingOptions from '../interfaces/event-adding-options';
-import chrononIsEvent from '../methods/chronon-is-event';
+import sortChronons from '../methods/sort-chronons';
 
 /**
  * Class handling temporal lines
@@ -50,23 +50,10 @@ class TemporalLine implements TemporalLineStructure {
 		let _date: number = typeof options.date === 'number' ? options.date : this.computeDate(options.date, options.putAtEnd);
 		let newEvent = new Event(options.name, _date);
 		this.chronons.push(newEvent);
-		this.chronons = this.chronons.sort(this.sortByEarliest);
+		this.chronons = this.chronons.sort(sortChronons);
 
 		return newEvent;
 	};
-
-	/**
-	 * Method used inside Array.sort to sort chronons from oldest to newest
-	 * @param chronon1 First Chronon
-	 * @param chronon2 Second Chronon
-	 * @see MDN https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
-	 */
-	private sortByEarliest(chronon1: Chronon, chronon2: Chronon) {
-		const firstCompared = chrononIsEvent(chronon1) ? chronon1.occuring_time : (chronon1 as Period).startingPoint;
-		const secondCompared = chrononIsEvent(chronon2) ? chronon2.occuring_time : (chronon2 as Period).startingPoint;
-
-		return firstCompared - secondCompared;
-	}
 
 	/**
 	 * Adds a new Period to the temporal line if the dates are valid, throws an error otherwise

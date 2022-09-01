@@ -9,6 +9,7 @@ import Event from './event';
 import Calendar from './calendarHandler';
 import PeriodAddingOptions from '../interfaces/period-adding-options';
 import EventAddingOptions from '../interfaces/event-adding-options';
+import sortChronons from '../methods/sort-chronons';
 
 /**
  * Class handling everything related to periods
@@ -60,6 +61,7 @@ class Period implements PeriodStruct {
 		let _date: number = typeof options.date === 'number' ? options.date : this.computeDate(options.date, options.putAtEnd);
 		let newEvent = new Event(options.name, _date + offsetValue);
 		this.sub_chronons.push(newEvent);
+		this.sub_chronons = this.sub_chronons.sort(sortChronons);
 
 		return newEvent;
 	};
