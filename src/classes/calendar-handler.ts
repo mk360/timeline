@@ -139,21 +139,25 @@ class Calendar implements CalendarStruct {
 
 		// for (let i: number = 0; i < date.length; ++i)
 		// 	elapsedTime += (date[i]-1)*this.getConv(i);
-		//primary calculation		
-		//for (let i: number = 0; i < date.length; ++i)
-			// elapsedTime += (date[i]-1)*this.getConv(i);
 
-		elapsedTime += (date[0]-1)*365;
-		const div = this.divisions[1].unitsLength;
-		if (Array.isArray(div)) {
-			let t = div.slice(0, date[1]-1).reduce<number>((acc, length) => {return acc + this.getDivisionLength(length)}, 0);
-			elapsedTime += t;
+		//primary calculation
+		for (let i: number = 0; i < date.length; ++i) {
+			const divUnits = this.divisions[i].unitsLength;
+
+			if (Array.isArray(divUnits)) {
+				let t = divUnits.slice(0, date[i]-1).reduce<number>((acc, length) => {return acc + this.getDivisionLength(length)}, 0);
+				elapsedTime += t;
+			}
+			else {
+				if (i == date.length-1)
+					elapsedTime += date[i]-1;
+				else
+					elapsedTime += (date[i]-1)*this.getConv(i);
+			}
+
 		}
 
-		elapsedTime += (date[2]-1);
-
-		//secondary Calculation
-
+		//secondary calculation
 		elapsedTime += Math.trunc((date[0]-1)/4) - Math.trunc((date[0]-1)/100) + Math.trunc((date[0]-1)/400);
 		if (((date[0] % 4 === 0 && date[0] % 100 !== 0) || date[0] % 400 === 0) && date[1]>2)
 			elapsedTime += 1;
