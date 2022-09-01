@@ -134,12 +134,29 @@ class Calendar implements CalendarStruct {
 	 * @param {boolean} [fromStartingPoint=false] - !!!
 	 * @returns {number} - The elapsed time in basic division time between the date and the zero point of the calendar
 	 */
-	getElapsedTime(date: number[], fromStartingPoint: boolean = false): number {
+ 	getElapsedTime(date: number[], fromStartingPoint: boolean = false): number {
 		let elapsedTime: number = 0;
 
-		for (let i: number = 0; i < date.length; ++i)
-			elapsedTime += (date[i]-1)*this.getConv(i);
+		// for (let i: number = 0; i < date.length; ++i)
+		// 	elapsedTime += (date[i]-1)*this.getConv(i);
+		//primary calculation		
+		//for (let i: number = 0; i < date.length; ++i)
+			// elapsedTime += (date[i]-1)*this.getConv(i);
 
+		elapsedTime += (date[0]-1)*365;
+		const div = this.divisions[1].unitsLength;
+		if (Array.isArray(div)) {
+			let t = div.slice(0, date[1]-1).reduce<number>((acc, length) => {return acc + this.getDivisionLength(length)}, 0);
+			elapsedTime += t;
+		}
+
+		elapsedTime += (date[2]-1);
+
+		//secondary Calculation
+
+		elapsedTime += Math.trunc((date[0]-1)/4) - Math.trunc((date[0]-1)/100) + Math.trunc((date[0]-1)/400);
+		if (((date[0] % 4 === 0 && date[0] % 100 !== 0) || date[0] % 400 === 0) && date[1]>2)
+			elapsedTime += 1;
 
 		return elapsedTime;
 	};
