@@ -20,6 +20,8 @@ class Timeline implements TimelineStruct {
 	temporalLines: TemporalLine[];
 	/** @member {number} startingPoint - The starting date for the timeline. It is stored in a number representing the number of basic calendar division elapsed since the zero point (01/01/01)*/
 	startingPoint: number;
+	/** @member {number} endingPoint - The ending date for the timeline. It is stored in a number representing the number of basic calendar divisions elapsed since the zero point (01/01/01) */
+	endingPoint: number;
 
 	/**
 	 * Creates a new timeline
@@ -59,6 +61,16 @@ class Timeline implements TimelineStruct {
 		else if (typeof time === 'number')
 			this.startingPoint = time;
 	};
+
+	setEndingPoint(divValues: number[]): void;
+	setEndingPoint(timeElapsed: number): void;
+	setEndingPoint(time: number | number[]): void {
+		if (Array.isArray(time)) {
+			this.endingPoint = this.calendar.getElapsedTime(time);
+		} else {
+			this.endingPoint = time;
+		}
+	}
 
 	/**
 	 * Adds a temporal line to the timeline
