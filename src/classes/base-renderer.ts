@@ -13,12 +13,7 @@ function* getNextPositionMultiplier() {
 	let multiplier = -1;
 
 	while (true) {
-		yield multiplier;
-		if (multiplier === -1) {
-			multiplier = -2;
-		} else {
-			multiplier = -1;
-		}
+		yield 1;
 	}
 
 	return multiplier;
@@ -44,12 +39,12 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		const linePosition = SvgConfig.height / 1.5;
 		const line = componentFactory.createAbsoluteLine(0, linePosition, Number.MAX_SAFE_INTEGER, 0, 'black', 1);
 		const yr = this.getYear(this.tl.startingPoint);
-
-		for (let i = 0; i < yr; i++) {
+		
+		for (let i = -2; i < 5; i++) {
 			const computedYear = i + yr;
-			const renderPosition = this.tl.calendar.getElapsedTime([computedYear, 1, 1]) - this.tl.calendar.getElapsedTime([yr, 1, 1]);
-			const notch = componentFactory.createAbsoluteBox(renderPosition, +line.getAttribute('y1') - 5, 10, 1, 'black');
-			const yearLabel = componentFactory.createAbsoluteText(+notch.getAttribute('x') - 10, +notch.getAttribute('y') - 5, computedYear.toString(), 10, 'black');
+			const yearRendering = this.tl.calendar.getElapsedTime([computedYear, 1, 1]) - this.tl.startingPoint;
+			const notch = componentFactory.createAbsoluteBox(yearRendering, +line.getAttribute('y1') - 5, 10, 1, 'black');
+			componentFactory.createAbsoluteText(+notch.getAttribute('x') - 10, +notch.getAttribute('y') - 5, computedYear.toString(), 10, 'black');
 		}
 	}
 
@@ -84,7 +79,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		}
 
 		for (let event of events) {
-			eventRenderPosition += getChrononStart(event) - this.tl.startingPoint;
+			eventRenderPosition = getChrononStart(event);
 			this.renderEvent(event, temporalLinePosition, eventRenderPosition);
 		}
 	}
@@ -103,7 +98,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 
 	renderEvent(event: Event, linePosition: number, renderPosition: number) {
 		const y1 = linePosition;
-		const eventLine = componentFactory.createAbsoluteLine(renderPosition / 20, y1, 40, -90, 'rgba(200, 200, 200, 0.9)', 1, false);
+		const eventLine = componentFactory.createAbsoluteLine(renderPosition, y1, 40, -90, 'rgba(200, 200, 200, 0.9)', 1, false);
 		eventLine.classList.add('event-line');
 		const eventLineY2 = +eventLine.getAttribute('y2');
 		const boxHeight = SvgConfig.eventBoxHeight;
@@ -125,4 +120,4 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 	}
 }
 
-export default BaseTimelineRenderer
+export default BaseTimelineRenderer;
