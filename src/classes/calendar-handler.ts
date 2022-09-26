@@ -4,7 +4,8 @@
  */
 
 import CalendarStruct from '../interfaces/calendar'
-import Division from '../interfaces/division'
+import Division from '../classes/division'
+import Oddity from '../classes/oddity-handler'
 import { Matrix } from 'ts-matrix';
 
 /* ===CALENDAR NOTES
@@ -23,7 +24,8 @@ class Calendar implements CalendarStruct {
 	divisions: Division[];
 	secondaryDivisions?: Division[];
 	/** @member {Matrix} calendarConvTable - A matrix filled with the conversion rates between calendar's divisions */
-	calendarConvTable: Matrix; 
+	calendarConvTable: Matrix;
+	oddities: Oddity[];
 
 	/**
 	 * Creates a new calendar. Sets members to the identity element and create a matrix of 1,1 for the conversion table
@@ -31,6 +33,7 @@ class Calendar implements CalendarStruct {
 	 */
 	constructor() {
 		this.divisions = [];
+		this.oddities = [];
 		this.calendarConvTable = new Matrix(1, 1);
 	};
 
@@ -159,10 +162,23 @@ class Calendar implements CalendarStruct {
 
 		//secondary calculation
 		elapsedTime += Math.trunc((date[0]-1)/4) - Math.trunc((date[0]-1)/100) + Math.trunc((date[0]-1)/400);
+//		elapsedTime += this.oddities[0].getNbOccurences(date[0], 1);
 		if (((date[0] % 4 === 0 && date[0] % 100 !== 0) || date[0] % 400 === 0) && date[1]>2)
 			elapsedTime += 1;
 
 		return elapsedTime;
+	};
+
+	/**
+	 * Adds an irregularity to the standard structure of the calendar
+	 * @method addOddity
+	 * @param {number} [div] - The division on which the oddity is
+	 * @param {number} [unit] - The unit modified by the oddity
+	 * @param {number} [value] - The odd value of the unit
+	 * @param {((...cond_unit: number[]) => boolean)} [condition] - The condition upon which the unit is modified
+	 */
+	addOddity(div: number, unit: number, value: number, condition: ((...cond_unit: number[]) => boolean), occurences: ((...boundaries: number[]) => number)): void {
+		this.oddities.push(new Oddity(div, unit, value, condition, occurences));
 	};
 
 	/**

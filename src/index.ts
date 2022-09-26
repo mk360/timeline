@@ -6,7 +6,16 @@ import BaseTimelineRenderer from './classes/base-renderer';
 
 let ww2tl = new Timeline();
 ww2tl.addDivision("année", 12);
+ww2tl.addDivision("mois", [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"]);
+ww2tl.addDivision("jour");
 console.log(ww2tl.calendar.divisions);
+
+ww2tl.addOddity(1, 1, 1, (year) => {return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0}, (...years) => {return Math.trunc((years[1]-years[0])/4) - Math.trunc((years[1]-years[0])/100) + Math.trunc((years[1]-years[0])/400)});
+console.log("Test oddities");
+console.log(ww2tl.calendar.oddities[0].isOdd(1936));
+
+ww2tl.setStartingPoint([1939, 9, 1]);
+console.log(ww2tl.startingPoint);
 
 let getFebruaryLength = (cal: Calendar, year: number): number => {
 	if ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0)
@@ -14,14 +23,6 @@ let getFebruaryLength = (cal: Calendar, year: number): number => {
 	else
 		return 28;
 };
-
-ww2tl.addDivision("mois", [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"]);
-console.log(ww2tl.calendar.divisions);
-ww2tl.addDivision("jour");
-console.log(ww2tl.calendar.divisions);
-
-ww2tl.setStartingPoint([1939, 9, 1]);
-console.log(ww2tl.startingPoint);
 
 let germanyTpl = ww2tl.addTemporalLine("Allemagne");
 console.log(ww2tl.temporalLines);
@@ -51,7 +52,7 @@ let evntIncendieReichstag = germanyTpl.addEvent({
 let perGleichschaltung = thirdReichPeriod.addPeriod({
 	name: "Gleichschaltung", 
 	start: {
-		date: [1933, 2, 28], 
+		date: [1933, 2, 28],
 	},
 	end: {
 		date: [1934, 8, 19]

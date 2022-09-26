@@ -73,6 +73,18 @@ class Timeline implements TimelineStruct {
 	}
 
 	/**
+	 * Adds an irregularity to the standard structure of the calendar
+	 * @method addOddity
+	 * @param {number} [div] - The division on which the oddity is
+	 * @param {number} [unit] - The unit modified by the oddity
+	 * @param {number} [value] - The odd value of the unit
+	 * @param {((...cond_unit: number[]) => boolean)} [condition] - The condition upon which the unit is modified
+	 */
+	addOddity(div: number, unit: number, value: number, condition: ((...cond_unit: number[]) => boolean), occurences: ((...boundaries: number[]) => number)): void {
+		this.calendar.addOddity(div, unit, value, condition, occurences);
+	};
+
+	/**
 	 * Adds a temporal line to the timeline
 	 * @method addTemporalLine
 	 * @param {string} name - The name of the temporal line

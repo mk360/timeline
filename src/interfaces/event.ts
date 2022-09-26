@@ -14,6 +14,6 @@ interface EventStruct extends Chronon {
 	occuring_time: number;
 	//offset_min: number | number[]
 	//offset_max: number | number[]
-}
+};
 
 export default EventStruct;
