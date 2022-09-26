@@ -4,13 +4,15 @@ class Oddity implements OddityStruct {
 	div: number;
 	unit: number;
 	value: number;
+	checker_div: number;
 	condition: ((...cond_unit: number[]) => boolean);
 	occurences: ((...boundaries: number[]) => number);
 
-	constructor(div: number, unit: number, value: number, condition: ((...cond_unit: number[]) => boolean), occurences: ((...boundaries: number[]) => number)) {
+	constructor(div: number, unit: number, value: number, checker_div: number, condition: ((...cond_unit: number[]) => boolean), occurences: ((...boundaries: number[]) => number)) {
 		this.div = div;
 		this.unit = unit;
 		this.value = value;
+		this.checker_div = checker_div;
 		this.condition = condition;
 		this.occurences = occurences;
 	};

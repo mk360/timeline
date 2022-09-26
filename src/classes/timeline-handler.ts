@@ -79,8 +79,8 @@ class Timeline implements TimelineStruct {
 	 * @param {number} [value] - The odd value of the unit
 	 * @param {((...cond_unit: number[]) => boolean)} [condition] - The condition upon which the unit is modified
 	 */
-	addOddity(div: number, unit: number, value: number, condition: ((...cond_unit: number[]) => boolean), occurences: ((...boundaries: number[]) => number)): void {
-		this.calendar.addOddity(div, unit, value, condition, occurences);
+	addOddity(div: number, unit: number, value: number, checker_div: number, condition: ((...cond_unit: number[]) => boolean), occurences: ((...boundaries: number[]) => number)): void {
+		this.calendar.addOddity(div, unit, value, checker_div, condition, occurences);
 	};
 
 	/**

@@ -10,21 +10,54 @@ ww2tl.addDivision("mois", [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], ["Ja
 ww2tl.addDivision("jour");
 console.log(ww2tl.calendar.divisions);
 
-ww2tl.addOddity(1, 1, 1, (year) => {return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0}, (...years) => {return Math.trunc((years[1]-years[0])/4) - Math.trunc((years[1]-years[0])/100) + Math.trunc((years[1]-years[0])/400)});
+ww2tl.addOddity(1, 1, 1, 0, (year) => {return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0}, (...years) => {return Math.trunc((years[1]-years[0])/4) - Math.trunc((years[1]-years[0])/100) + Math.trunc((years[1]-years[0])/400)});
 console.log("Test oddities");
 console.log(ww2tl.calendar.oddities[0].isOdd(1936));
 
 ww2tl.setStartingPoint([1929, 8, 1]);
 ww2tl.setEndingPoint([1947, 8, 1]);
 console.log(ww2tl.startingPoint);
+/*
+let testFev = ww2tl.addTemporalLine("Dummy");
+testFev.addEvent({
+	name: "28/02/1934", 
+	date: [1934, 2, 28]
+});
+testFev.addEvent({
+	name: "01/03/1934", 
+	date: [1934, 3, 1]
+});
+testFev.addEvent({
+	name: "28/02/1935", 
+	date: [1935, 2, 28]
+});
+testFev.addEvent({
+	name: "01/03/1935", 
+	date: [1935, 3, 1]
+});
+testFev.addEvent({
+	name: "28/02/1936", 
+	date: [1936, 2, 28]
+});
+testFev.addEvent({
+	name: "29/02/1936", 
+	date: [1936, 2, 29]
+});
+testFev.addEvent({
+	name: "01/03/1936", 
+	date: [1936, 3, 1]
+});
+testFev.addEvent({
+	name: "28/02/1937", 
+	date: [1937, 2, 28]
+});
+testFev.addEvent({
+	name: "01/03/1937", 
+	date: [1937, 3, 1]
+});
 
-let getFebruaryLength = (cal: Calendar, year: number): number => {
-	if ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0)
-		return 29;
-	else
-		return 28;
-};
-
+console.log(ww2tl.temporalLines[0].chronons);
+*/
 let germanyTpl = ww2tl.addTemporalLine("Allemagne");
 console.log(ww2tl.temporalLines);
 let evntHitlerChancelier = germanyTpl.addEvent({

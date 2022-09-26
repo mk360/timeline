@@ -140,9 +140,6 @@ class Calendar implements CalendarStruct {
  	getElapsedTime(date: number[], fromStartingPoint: boolean = false): number {
 		let elapsedTime: number = 0;
 
-		// for (let i: number = 0; i < date.length; ++i)
-		// 	elapsedTime += (date[i]-1)*this.getConv(i);
-
 		//primary calculation
 		for (let i: number = 0; i < date.length; ++i) {
 			const divUnits = this.divisions[i].unitsLength;
@@ -161,10 +158,12 @@ class Calendar implements CalendarStruct {
 		}
 
 		//secondary calculation
-		elapsedTime += Math.trunc((date[0]-1)/4) - Math.trunc((date[0]-1)/100) + Math.trunc((date[0]-1)/400);
-//		elapsedTime += this.oddities[0].getNbOccurences(date[0], 1);
-		if (((date[0] % 4 === 0 && date[0] % 100 !== 0) || date[0] % 400 === 0) && date[1]>2)
-			elapsedTime += 1;
+		for (let i: number = 0; i < this.oddities.length; ++i) {
+			elapsedTime += this.oddities[i].getNbOccurences(1, date[this.oddities[i].checker_div]);
+
+			if (this.oddities[i].isOdd(date[this.oddities[i].checker_div]) && (date[this.oddities[i].div] > this.oddities[i].unit+1))
+				elapsedTime += this.oddities[i].value;
+		}
 
 		return elapsedTime;
 	};
@@ -175,10 +174,12 @@ class Calendar implements CalendarStruct {
 	 * @param {number} [div] - The division on which the oddity is
 	 * @param {number} [unit] - The unit modified by the oddity
 	 * @param {number} [value] - The odd value of the unit
+	 * @param {checker_div} [value] - The div which serves to check the oddity
 	 * @param {((...cond_unit: number[]) => boolean)} [condition] - The condition upon which the unit is modified
+	 * @param {((...boundaries: number[]) => number)} [occurences] - The number of times this oddity appeared during an interval
 	 */
-	addOddity(div: number, unit: number, value: number, condition: ((...cond_unit: number[]) => boolean), occurences: ((...boundaries: number[]) => number)): void {
-		this.oddities.push(new Oddity(div, unit, value, condition, occurences));
+	addOddity(div: number, unit: number, value: number, checker_div: number, condition: ((...cond_unit: number[]) => boolean), occurences: ((...boundaries: number[]) => number)): void {
+		this.oddities.push(new Oddity(div, unit, value, checker_div, condition, occurences));
 	};
 
 	/**
