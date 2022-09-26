@@ -14,7 +14,8 @@ ww2tl.addOddity(1, 1, 1, (year) => {return (year % 4 === 0 && year % 100 !== 0) 
 console.log("Test oddities");
 console.log(ww2tl.calendar.oddities[0].isOdd(1936));
 
-ww2tl.setStartingPoint([1939, 9, 1]);
+ww2tl.setStartingPoint([1929, 8, 1]);
+ww2tl.setEndingPoint([1947, 8, 1]);
 console.log(ww2tl.startingPoint);
 
 let getFebruaryLength = (cal: Calendar, year: number): number => {
