@@ -5,9 +5,8 @@ import componentFactory from './component-factory';
 import Event from './event';
 import Timeline from './timeline-handler';
 import Period from './period';
-import chrononIsEvent from '../methods/chronon-is-event';
 import getChrononStart from '../methods/get-chronon-start';
-import ChrononStruct from '../interfaces/chronon';
+import BoundingBox from '../interfaces/bounding-box';
 
 function* getNextPositionMultiplier() {
 	let multiplier = 1;
@@ -40,6 +39,12 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 	private tl: Timeline;
 	private positionGetter = getNextPosition();
 	private renderOffset: number;
+	private boundingBox: BoundingBox = {
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+	};
 
 	render(timeline: Timeline) {
 		this.tl = timeline;
@@ -127,6 +132,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		const periodDuration = period.end - period.start;
 		const periodHeight = SvgConfig.temporalLineHeight;
 		const periodFrame = componentFactory.createAbsoluteBox(position, linePosition - 80, periodHeight, periodDuration, 'rgba(255, 0, 0, 0.2)');
+		const periodNameFrame = componentFactory.createAbsoluteBox(+periodFrame.getAttribute('x'), +periodFrame.getAttribute('y'), 20, +periodFrame.getAttribute('width'), 'gray');
 		const periodName = componentFactory.createAbsoluteText(+periodFrame.getAttribute('x') + 10, +periodFrame.getAttribute('y') + 15, period.name, 10, 'black')
 	}
 
@@ -140,6 +146,9 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		group.classList.add('event-group');
 		const eventBox = componentFactory.createAbsoluteBox(+eventNotch.getAttribute('x1') - 1, eventLineY2 - boxHeight / 2, boxHeight, boxHeight * 2, 'rgba(200, 200, 200, 0.9)', false);
 		eventBox.classList.add('event-box');
+		eventBox.setAttribute('rx', '4');
+		eventBox.setAttribute('ry', '4');
+		
 		const eventLabel = componentFactory.createAbsoluteText(+eventBox.getAttribute('x') + 4, +eventBox.getAttribute('y') + 17, event.name, 16, 'black', false);
 		eventLabel.classList.add('event-label');
 		group.append(eventBox, eventNotch, eventLabel);

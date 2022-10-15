@@ -7,6 +7,7 @@ import TimelineStruct from '../interfaces/timeline';
 import Division from './division';
 import Calendar from './calendar-handler';
 import TemporalLine from './temporal-line-handler';
+import { takeCoverage } from 'v8';
 
 /**
  * Handles a timeline, ie, a collection of temporal lines referencing chronons according to a calendar
