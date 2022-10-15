@@ -1,20 +1,17 @@
 import Timeline from './classes/timeline-handler';
 import Calendar from './classes/calendar-handler';
 import BaseTimelineRenderer from './classes/base-renderer';
+import gregorianCalendar from './classes/calendars/gregorianCalendar'
  
 // Exemple d'utilisation (sans offsets)
 
 let ww2tl = new Timeline();
-ww2tl.addDivision("année", 12);
-ww2tl.addDivision("mois", [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"]);
-ww2tl.addDivision("jour");
-console.log(ww2tl.calendar.divisions);
+ww2tl.setCalendar(gregorianCalendar);
 
-ww2tl.addOddity(1, 1, 1, 0, (year) => {return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0}, (...years) => {return Math.trunc((years[1]-years[0])/4) - Math.trunc((years[1]-years[0])/100) + Math.trunc((years[1]-years[0])/400)});
 console.log("Test oddities");
 console.log(ww2tl.calendar.oddities[0].isOdd(1936));
 
-ww2tl.setStartingPoint([1929, 8, 1]);
+ww2tl.setStartingPoint([1939, 9, 1]);
 ww2tl.setEndingPoint([1947, 8, 1]);
 console.log(ww2tl.startingPoint);
 /*

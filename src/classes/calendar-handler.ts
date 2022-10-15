@@ -5,6 +5,7 @@
 
 import CalendarStruct from '../interfaces/calendar'
 import Division from '../classes/division'
+import SecondaryDivision from '../classes/secondaryDivision'
 import Oddity from '../classes/oddity-handler'
 import { Matrix } from 'ts-matrix';
 
@@ -33,18 +34,25 @@ class Calendar implements CalendarStruct {
 	 */
 	constructor() {
 		this.divisions = [];
+		this.secondaryDivisions = [];
 		this.oddities = [];
 		this.calendarConvTable = new Matrix(1, 1);
 	};
 
 	/**
-	 * Pushes a new calendar division in the division list, and computes a new conversion table
+	 * Creates a Division instance with params and calls calendar.addDivision with the created instance
 	 * @method addDivision
-	 * @param {Division} newDivision - The newly-added division
+	 * @param {string} name - The name of the division
+	 * @param {(number|number[])} [unitsLength] - The number of units in which this division is subdivided (for exemple, 12 for a year divided in months). A number[] indicates that the division is irregularily subdivided (like months whose number of days depends of said month)
+	 * @param {string[]} [unitsNames] - The names for the division's units (for exemple, the months' names for a month division)
 	 */
-	addDivision(newDivision: Division):void {
-		this.divisions.push(newDivision);
+	addDivision(name: string, unitsLength?: number | (number | ((c: Calendar, x: number) => number))[], unitsNames?: string[]): void {
+		this.divisions.push(new Division(name, unitsLength, unitsNames));
 		this.computeCalendarConvTable();
+	};
+
+	addSecondaryDivision(name: string, level: number, unitsLength: number, unitsNames?: string[]) {
+		this.secondaryDivisions.push(new SecondaryDivision(name, level, unitsLength, unitsNames));
 	};
 
 	/**
