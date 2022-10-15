@@ -75,7 +75,7 @@ let thirdReichPeriod = germanyTpl.addPeriod({
 	}
 });
 
-let evntIncendieReichstag = germanyTpl.addEvent({
+germanyTpl.addEvent({
 	name: "Incendie du Reichstag",
 	date: [1933, 2, 27]
 });

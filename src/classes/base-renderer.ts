@@ -126,7 +126,8 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 
 		const periodDuration = period.end - period.start;
 		const periodHeight = SvgConfig.temporalLineHeight;
-		componentFactory.createAbsoluteBox(position, linePosition - 80, periodHeight, periodDuration, 'rgba(255, 0, 0, 0.2)');
+		const periodFrame = componentFactory.createAbsoluteBox(position, linePosition - 80, periodHeight, periodDuration, 'rgba(255, 0, 0, 0.2)');
+		const periodName = componentFactory.createAbsoluteText(+periodFrame.getAttribute('x') + 10, +periodFrame.getAttribute('y') + 15, period.name, 10, 'black')
 	}
 
 	renderEvent(event: Event, linePosition: number, renderPosition: number) {
