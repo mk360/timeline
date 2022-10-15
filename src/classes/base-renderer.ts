@@ -11,9 +11,12 @@ import getChrononStart from '../methods/get-chronon-start';
 
 function* getNextPositionMultiplier() {
 	let multiplier = 1;
-
-	yield -multiplier;
-	multiplier++;
+	while (true) {
+		yield multiplier;
+		yield -multiplier;
+		multiplier++;
+	}
+	
 	return multiplier;
 };
 
@@ -25,9 +28,8 @@ function* getNextPosition() {
 	while (true) {
 		const nextMultiplier = multiplier.next();
 		yield offset * nextMultiplier.value;
-		if (nextMultiplier.done) {
-			offset -= SvgConfig.temporalLineHeight;
-			multiplier = getNextPositionMultiplier();
+		if (nextMultiplier.value > 0) {
+			offset += SvgConfig.temporalLineHeight;
 		}
 	}
 
@@ -44,8 +46,8 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		let temporalLinePosition = SvgConfig.height / 2;
 		for (let line of this.tl.temporalLines) {
 			this.renderTemporalLine(line, temporalLinePosition);
-			const val = this.positionGetter.next().value;
-			temporalLinePosition += val;
+			const positionOffset = this.positionGetter.next().value;
+			temporalLinePosition += positionOffset;
 		}
 
 		this.renderReferenceLine();
@@ -54,7 +56,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 	renderReferenceLine() {
 		const startingYear = this.getYear(this.tl.startingPoint);
 		const endingYear = this.getYear(this.tl.endingPoint);
-		const linePosition = SvgConfig.height / 1.5;
+		const linePosition = SvgConfig.height / 2;
 		const line = componentFactory.createAbsoluteLine(0, linePosition, Number.MAX_SAFE_INTEGER, 0, 'black', 1);
 		
 		for (let i = 0; i < endingYear - startingYear + 1; i++) {
@@ -116,14 +118,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		eventLine.classList.add('event-line');
 		const eventLineY2 = +eventLine.getAttribute('y2');
 		const boxHeight = SvgConfig.eventBoxHeight;
-		const group = hoverable(componentFactory.createAbsoluteGroup(), {
-			in(element) {
-				const [box, line, label] = Array.from(element.children);
-			},
-			out(element) {
-				const [box, line, label] = Array.from(element.children);
-			}
-		});
+		const group = componentFactory.createAbsoluteGroup();
 		group.classList.add('event-group');
 		const eventBox = componentFactory.createAbsoluteBox(+eventLine.getAttribute('x1') - 1, eventLineY2 - boxHeight / 2, boxHeight, boxHeight * 2, 'rgba(200, 200, 200, 0.9)', false);
 		eventBox.classList.add('event-box');
