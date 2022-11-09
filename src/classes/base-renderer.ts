@@ -57,6 +57,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		}
 
 		this.renderReferenceLine();
+		this.bindListeners();
 	}
 
 	renderReferenceLine() {
@@ -79,6 +80,17 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		const yearOffset = yearOne - yearZero;
 
 		return Math.floor(timelinePoint / yearOffset);
+	}
+
+	bindListeners() {
+		const eventBoxes = Array.from<SVGRectElement>(document.querySelectorAll('.event-box'));
+
+		// for (let box of eventBoxes) {
+		// 	box.onmouseover = function() {
+		// 		box.parentElement.parentElement.insertBefore(box.parentElement, box.parentElement.previousElementSibling);
+		// 		box.parentElement.parentElement.removeChild(box.parentElement);
+		// 	}
+		// }
 	}
 
 	getEventsFromPeriod(period: Period, storedEvents?: Event[]) {
@@ -131,14 +143,14 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 
 		const periodDuration = period.end - period.start;
 		const periodHeight = SvgConfig.temporalLineHeight;
-		const periodFrame = componentFactory.createAbsoluteBox(position, linePosition - 80, periodHeight, periodDuration, 'rgba(255, 0, 0, 0.2)');
-		const periodNameFrame = componentFactory.createAbsoluteBox(+periodFrame.getAttribute('x'), +periodFrame.getAttribute('y'), 20, +periodFrame.getAttribute('width'), 'gray');
+		const periodFrame = componentFactory.createAbsoluteBox(position, linePosition - 80, periodHeight, periodDuration, 'rgb(229, 229, 229)');
+		const periodNameFrame = componentFactory.createAbsoluteBox(+periodFrame.getAttribute('x'), +periodFrame.getAttribute('y'), 20, +periodFrame.getAttribute('width'), 'rgb(191, 191, 191)');
 		const periodName = componentFactory.createAbsoluteText(+periodFrame.getAttribute('x') + 10, +periodFrame.getAttribute('y') + 15, period.name, 10, 'black')
 	}
 
 	renderEvent(event: Event, linePosition: number, renderPosition: number) {
 		const y1 = linePosition;
-		const eventNotch = componentFactory.createAbsoluteLine(renderPosition, y1, 40, -90, 'rgba(200, 200, 200, 0.9)', 1, false);
+		const eventNotch = componentFactory.createAbsoluteLine(renderPosition, y1, 40, -90, 'rgba(200, 200, 200, 0.9)', 2, false);
 		eventNotch.classList.add('event-line');
 		const eventLineY2 = +eventNotch.getAttribute('y2');
 		const boxHeight = SvgConfig.eventBoxHeight;
