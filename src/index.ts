@@ -1,5 +1,4 @@
 import Timeline from './classes/timeline-handler';
-import Calendar from './classes/calendar-handler';
 import BaseTimelineRenderer from './classes/base-renderer';
 import gregorianCalendar from './classes/calendars/gregorianCalendar'
 import islamicCalendar from './classes/calendars/islamicCalendar'
@@ -12,7 +11,7 @@ ww2tl.setCalendar(gregorianCalendar);
 console.log("Test oddities");
 console.log(ww2tl.calendar.oddities[0].isOdd(1936));
 
-ww2tl.setStartingPoint([1939, 9, 1]);
+ww2tl.setStartingPoint([1932, 9, 1]);
 ww2tl.setEndingPoint([1947, 8, 1]);
 console.log(ww2tl.startingPoint);
 /*
@@ -59,6 +58,7 @@ console.log(ww2tl.temporalLines[0].chronons);
 
 let germanyTpl = ww2tl.addTemporalLine("Allemagne");
 console.log(ww2tl.temporalLines);
+
 let evntHitlerChancelier = germanyTpl.addEvent({
 	name: "Adolf Hitler est nommé chancelier du Reich", 
 	date: [1933, 1, 30]
@@ -77,7 +77,7 @@ let thirdReichPeriod = germanyTpl.addPeriod({
 	}
 });
 
-let evntIncendieReichstag = germanyTpl.addEvent({
+germanyTpl.addEvent({
 	name: "Incendie du Reichstag",
 	date: [1933, 2, 27]
 });
@@ -91,9 +91,10 @@ let perGleichschaltung = thirdReichPeriod.addPeriod({
 		date: [1934, 8, 19]
 	}
 });
+
 perGleichschaltung.addEvent({
 	name: "Adolf Hitler obtient les pleins pouvoirs", 
-	date: [1933, 3, 23]
+	date: [1935, 3, 23]
 });
 
 // germanyTpl.addPeriod({"Allemange occupée", thirdReichPeriod.end);

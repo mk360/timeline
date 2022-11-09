@@ -1,19 +1,21 @@
 import SvgConfig from '../constants/svg-config';
-import hoverable from '../plugins/hoverable';
 import TemporalLineStruct from '../interfaces/temporalLine';
 import AbsTimelineRenderer from './abstract-renderer';
 import componentFactory from './component-factory';
 import Event from './event';
 import Timeline from './timeline-handler';
 import Period from './period';
-import chrononIsEvent from '../methods/chronon-is-event';
 import getChrononStart from '../methods/get-chronon-start';
+import BoundingBox from '../interfaces/bounding-box';
 
 function* getNextPositionMultiplier() {
 	let multiplier = 1;
-
-	yield -multiplier;
-	multiplier++;
+	while (true) {
+		yield multiplier;
+		yield -multiplier;
+		multiplier++;
+	}
+	
 	return multiplier;
 };
 
@@ -25,9 +27,8 @@ function* getNextPosition() {
 	while (true) {
 		const nextMultiplier = multiplier.next();
 		yield offset * nextMultiplier.value;
-		if (nextMultiplier.done) {
-			offset -= SvgConfig.temporalLineHeight;
-			multiplier = getNextPositionMultiplier();
+		if (nextMultiplier.value > 0) {
+			offset += SvgConfig.temporalLineHeight;
 		}
 	}
 
@@ -37,6 +38,13 @@ function* getNextPosition() {
 class BaseTimelineRenderer extends AbsTimelineRenderer {
 	private tl: Timeline;
 	private positionGetter = getNextPosition();
+	private renderOffset: number;
+	private boundingBox: BoundingBox = {
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+	};
 
 	render(timeline: Timeline) {
 		this.tl = timeline;
@@ -44,8 +52,8 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		let temporalLinePosition = SvgConfig.height / 2;
 		for (let line of this.tl.temporalLines) {
 			this.renderTemporalLine(line, temporalLinePosition);
-			const val = this.positionGetter.next().value;
-			temporalLinePosition += val;
+			this.renderOffset = this.positionGetter.next().value;
+			temporalLinePosition += this.renderOffset;
 		}
 
 		this.renderReferenceLine();
@@ -54,7 +62,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 	renderReferenceLine() {
 		const startingYear = this.getYear(this.tl.startingPoint);
 		const endingYear = this.getYear(this.tl.endingPoint);
-		const linePosition = SvgConfig.height / 1.5;
+		const linePosition = SvgConfig.height / 2;
 		const line = componentFactory.createAbsoluteLine(0, linePosition, Number.MAX_SAFE_INTEGER, 0, 'black', 1);
 		
 		for (let i = 0; i < endingYear - startingYear + 1; i++) {
@@ -73,17 +81,33 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		return Math.floor(timelinePoint / yearOffset);
 	}
 
+	getEventsFromPeriod(period: Period, storedEvents?: Event[]) {
+		let events: Event[] = storedEvents ?? [];
+		for (let chronon of period.sub_chronons) {
+			if (chronon instanceof Period) {
+				const subEvents = this.getEventsFromPeriod(chronon, events);
+				events = events.concat(subEvents);
+			} else if (chronon instanceof Event) {
+				events.push(chronon);
+			}
+		}
+
+		return events;
+	}
+
 	renderTemporalLine(line: TemporalLineStruct, temporalLinePosition: number) {
 		const referenceLine = componentFactory.createAbsoluteLine(0, temporalLinePosition, Number.MAX_SAFE_INTEGER, 0, 'black', 2);
 		const { chronons } = line;
-		const events: Event[] = [];
+		let events: Event[] = [];
 		const periods: Period[] = [];
 
 		for (let chronon of chronons) {
-			if (chrononIsEvent(chronon)) {
+			if (chronon instanceof Period) {
+				const subEvents = this.getEventsFromPeriod(chronon);
+				events = events.concat(subEvents);
+				periods.push(chronon);
+			} else if (chronon instanceof Event) {
 				events.push(chronon);
-			} else {
-				periods.push(chronon as Period);
 			}
 		}
 
@@ -107,29 +131,27 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 
 		const periodDuration = period.end - period.start;
 		const periodHeight = SvgConfig.temporalLineHeight;
-		componentFactory.createAbsoluteBox(position, linePosition - 80, periodHeight, periodDuration, 'rgba(255, 0, 0, 0.2)');
+		const periodFrame = componentFactory.createAbsoluteBox(position, linePosition - 80, periodHeight, periodDuration, 'rgba(255, 0, 0, 0.2)');
+		const periodNameFrame = componentFactory.createAbsoluteBox(+periodFrame.getAttribute('x'), +periodFrame.getAttribute('y'), 20, +periodFrame.getAttribute('width'), 'gray');
+		const periodName = componentFactory.createAbsoluteText(+periodFrame.getAttribute('x') + 10, +periodFrame.getAttribute('y') + 15, period.name, 10, 'black')
 	}
 
 	renderEvent(event: Event, linePosition: number, renderPosition: number) {
 		const y1 = linePosition;
-		const eventLine = componentFactory.createAbsoluteLine(renderPosition, y1, 40, -90, 'rgba(200, 200, 200, 0.9)', 1, false);
-		eventLine.classList.add('event-line');
-		const eventLineY2 = +eventLine.getAttribute('y2');
+		const eventNotch = componentFactory.createAbsoluteLine(renderPosition, y1, 40, -90, 'rgba(200, 200, 200, 0.9)', 1, false);
+		eventNotch.classList.add('event-line');
+		const eventLineY2 = +eventNotch.getAttribute('y2');
 		const boxHeight = SvgConfig.eventBoxHeight;
-		const group = hoverable(componentFactory.createAbsoluteGroup(), {
-			in(element) {
-				const [box, line, label] = Array.from(element.children);
-			},
-			out(element) {
-				const [box, line, label] = Array.from(element.children);
-			}
-		});
+		const group = componentFactory.createAbsoluteGroup();
 		group.classList.add('event-group');
-		const eventBox = componentFactory.createAbsoluteBox(+eventLine.getAttribute('x1') - 1, eventLineY2 - boxHeight / 2, boxHeight, boxHeight * 2, 'rgba(200, 200, 200, 0.9)', false);
+		const eventBox = componentFactory.createAbsoluteBox(+eventNotch.getAttribute('x1') - 1, eventLineY2 - boxHeight / 2, boxHeight, boxHeight * 2, 'rgba(200, 200, 200, 0.9)', false);
 		eventBox.classList.add('event-box');
+		eventBox.setAttribute('rx', '4');
+		eventBox.setAttribute('ry', '4');
+		
 		const eventLabel = componentFactory.createAbsoluteText(+eventBox.getAttribute('x') + 4, +eventBox.getAttribute('y') + 17, event.name, 16, 'black', false);
 		eventLabel.classList.add('event-label');
-		group.append(eventBox, eventLine, eventLabel);
+		group.append(eventBox, eventNotch, eventLabel);
 		eventBox.setAttribute('width', `${eventLabel.getBBox().width + 10}px`);
 	}
 }
