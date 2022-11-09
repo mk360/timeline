@@ -27,6 +27,7 @@ class Calendar implements CalendarStruct {
 	/** @member {Matrix} calendarConvTable - A matrix filled with the conversion rates between calendar's divisions */
 	calendarConvTable: Matrix;
 	oddities: Oddity[];
+	id: String;
 
 	/**
 	 * Creates a new calendar. Sets members to the identity element and create a matrix of 1,1 for the conversion table
@@ -183,8 +184,8 @@ class Calendar implements CalendarStruct {
 	 * @param {number} [unit] - The unit modified by the oddity
 	 * @param {number} [value] - The odd value of the unit
 	 * @param {checker_div} [value] - The div which serves to check the oddity
-	 * @param {((...cond_unit: number[]) => boolean)} [condition] - The condition upon which the unit is modified
-	 * @param {((...boundaries: number[]) => number)} [occurences] - The number of times this oddity appeared during an interval
+	 * @param {((...cond_unit: number[]) => boolean)} [condition] - A function to check wether a value triggers the oddity or not
+	 * @param {((...boundaries: number[]) => number)} [occurences] - A function to compute the number of time a oddity appears during an interval
 	 */
 	addOddity(div: number, unit: number, value: number, checker_div: number, condition: ((...cond_unit: number[]) => boolean), occurences: ((...boundaries: number[]) => number)): void {
 		this.oddities.push(new Oddity(div, unit, value, checker_div, condition, occurences));

@@ -2,6 +2,7 @@ import Timeline from './classes/timeline-handler';
 import Calendar from './classes/calendar-handler';
 import BaseTimelineRenderer from './classes/base-renderer';
 import gregorianCalendar from './classes/calendars/gregorianCalendar'
+import islamicCalendar from './classes/calendars/islamicCalendar'
  
 // Exemple d'utilisation (sans offsets)
 
@@ -55,6 +56,7 @@ testFev.addEvent({
 
 console.log(ww2tl.temporalLines[0].chronons);
 */
+
 let germanyTpl = ww2tl.addTemporalLine("Allemagne");
 console.log(ww2tl.temporalLines);
 let evntHitlerChancelier = germanyTpl.addEvent({
@@ -134,3 +136,7 @@ tplGlobalEvents.addEvent({
 });
 
 new BaseTimelineRenderer().render(ww2tl);
+
+console.log("converted")
+let newTL = ww2tl.convertsTo(islamicCalendar);
+console.log(newTL);

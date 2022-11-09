@@ -7,6 +7,7 @@ import TimelineStruct from '../interfaces/timeline';
 import Division from './division';
 import Calendar from './calendar-handler';
 import TemporalLine from './temporal-line-handler';
+import getConvTable from '../constants/calendarConversionTable'
 
 /**
  * Handles a timeline, ie, a collection of temporal lines referencing chronons according to a calendar
@@ -65,18 +66,6 @@ class Timeline implements TimelineStruct {
 	}
 
 	/**
-	 * Adds an irregularity to the standard structure of the calendar
-	 * @method addOddity
-	 * @param {number} [div] - The division on which the oddity is
-	 * @param {number} [unit] - The unit modified by the oddity
-	 * @param {number} [value] - The odd value of the unit
-	 * @param {((...cond_unit: number[]) => boolean)} [condition] - The condition upon which the unit is modified
-	 */
-	addOddity(div: number, unit: number, value: number, checker_div: number, condition: ((...cond_unit: number[]) => boolean), occurences: ((...boundaries: number[]) => number)): void {
-		this.calendar.addOddity(div, unit, value, checker_div, condition, occurences);
-	};
-
-	/**
 	 * Adds a temporal line to the timeline
 	 * @method addTemporalLine
 	 * @param {string} name - The name of the temporal line
@@ -110,6 +99,14 @@ class Timeline implements TimelineStruct {
 	getConvRate(div1: number, div2?: number): number {
 		return this.calendar.getConv(div1, div2);
 	};
+
+	convertsTo(cal: Calendar): Timeline {
+		var converted_tl: Timeline = new Timeline(cal);
+		converted_tl.startingPoint = this.startingPoint + getConvTable(this.calendar.id, cal.id);
+		converted_tl.temporalLines = this.temporalLines
+
+		return converted_tl;
+	}
 
 }
 
