@@ -37,32 +37,28 @@ class Timeline implements TimelineStruct {
 		console.log("Constructed new Timeline");
 	}
 
+	setCalendar(newCalendar: Calendar): void {
+		this.calendar = newCalendar;
+	}
+
 	/**
 	 * Sets the starting point of the timeline. ! This is different from the zero point of the calendar !
 	 * @method setStartingPoint
 	 */
-	setStartingPoint(divValues: number[]): void;
-	setStartingPoint(timeElapsed: number): void;	//time elapsed since 01/01/0001 ou whatever équivalent dans le calendrier
-	setStartingPoint(time: any): void {
-
+	//time elapsed since 01/01/0001 ou whatever équivalent dans le calendrier
+	setStartingPoint(time: number|number[]): void {
 		if (Array.isArray(time))
 			this.startingPoint = this.calendar.getElapsedTime(time);
-		else if (typeof time === 'number')
+		else
 			this.startingPoint = time;
 	};
 
-	setEndingPoint(divValues: number[]): void;
-	setEndingPoint(timeElapsed: number): void;
 	setEndingPoint(time: number | number[]): void {
 		if (Array.isArray(time)) {
 			this.endingPoint = this.calendar.getElapsedTime(time);
 		} else {
 			this.endingPoint = time;
 		}
-	}
-
-	setCalendar(newCalendar: Calendar): void {
-		this.calendar = newCalendar;
 	}
 
 	/**
@@ -103,6 +99,14 @@ class Timeline implements TimelineStruct {
 	convertsTo(cal: Calendar): Timeline {
 		var converted_tl: Timeline = new Timeline(cal);
 		converted_tl.startingPoint = this.startingPoint + getConvTable(this.calendar.id, cal.id);
+		converted_tl.temporalLines = this.temporalLines
+
+		return converted_tl;
+	}
+
+	convertsToWithRate(cal: Calendar, rate: number): Timeline {
+		var converted_tl: Timeline = new Timeline(cal);
+		converted_tl.startingPoint = this.startingPoint + rate;
 		converted_tl.temporalLines = this.temporalLines
 
 		return converted_tl;

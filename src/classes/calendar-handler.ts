@@ -47,7 +47,7 @@ class Calendar implements CalendarStruct {
 	 * @param {(number|number[])} [unitsLength] - The number of units in which this division is subdivided (for exemple, 12 for a year divided in months). A number[] indicates that the division is irregularily subdivided (like months whose number of days depends of said month)
 	 * @param {string[]} [unitsNames] - The names for the division's units (for exemple, the months' names for a month division)
 	 */
-	addDivision(name: string, unitsLength?: number | (number | ((c: Calendar, x: number) => number))[], unitsNames?: string[]): void {
+	addDivision(name: string, unitsLength?: number | number[], unitsNames?: string[]): void {
 		this.divisions.push(new Division(name, unitsLength, unitsNames));
 		this.computeCalendarConvTable();
 	};
@@ -107,9 +107,7 @@ class Calendar implements CalendarStruct {
 		if (typeof currDiv.unitsLength === 'number')
 			sublength = currDiv.unitsLength;
 		else if (Array.isArray(currDiv.unitsLength)) {
-			const depthLength = currDiv.unitsLength.reduce<number>((accumulator, current) => {
-				return this.getDivisionLength(accumulator) + this.getDivisionLength(current);
-			}, 0);
+			const depthLength = currDiv.unitsLength.reduce<number>((accumulator, current) => {return accumulator + current;}, 0);
 			sublength = depthLength / currDiv.unitsLength.length;
 		} else if (typeof currDiv.unitsLength === 'undefined')
 			sublength = 1;
@@ -154,7 +152,7 @@ class Calendar implements CalendarStruct {
 			const divUnits = this.divisions[i].unitsLength;
 
 			if (Array.isArray(divUnits)) {
-				let t = divUnits.slice(0, date[i]-1).reduce<number>((acc, length) => {return acc + this.getDivisionLength(length)}, 0);
+				let t = divUnits.slice(0, date[i]-1).reduce<number>((acc, unitLength) => {return acc + unitLength}, 0);
 				elapsedTime += t;
 			}
 			else {

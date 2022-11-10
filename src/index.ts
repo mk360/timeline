@@ -55,6 +55,9 @@ testFev.addEvent({
 
 console.log(ww2tl.temporalLines[0].chronons);
 */
+// offsets
+// calculs de date ?
+// virer refCalendar
 
 let germanyTpl = ww2tl.addTemporalLine("Allemagne");
 console.log(ww2tl.temporalLines);
@@ -140,4 +143,5 @@ new BaseTimelineRenderer().render(ww2tl);
 
 console.log("converted")
 let newTL = ww2tl.convertsTo(islamicCalendar);
+console.log("islamicCalendar");
 console.log(newTL);
