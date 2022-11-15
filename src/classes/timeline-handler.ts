@@ -7,7 +7,7 @@ import TimelineStruct from '../interfaces/timeline';
 import Division from './division';
 import Calendar from './calendar-handler';
 import TemporalLine from './temporal-line-handler';
-import getConvTable from '../constants/calendarConversionTable'
+import getConvTable from '../constants/calendar-conversion-table'
 import Chronon from '../interfaces/chronon'
 import Event from '../classes/event'
 import Period from '../classes/period'
