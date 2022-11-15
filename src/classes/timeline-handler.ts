@@ -112,7 +112,7 @@ class Timeline implements TimelineStruct {
 	 * @returns {Timeline} - The converted Timeline 
 	 */
 	convertsTo(cal: Calendar): Timeline {
-		var converted_tl: Timeline = new Timeline(cal);
+		const converted_tl = new Timeline(cal);
 		converted_tl.startingPoint = this.startingPoint + getConvTable(this.calendar.id, cal.id);
 		converted_tl.temporalLines = this.temporalLines
 
