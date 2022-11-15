@@ -1,7 +1,7 @@
 function pannable<T extends HTMLObjectElement>(element: T) {
     let shouldPan = false;
 
-    element.style.cursor = 'move';
+    element.style.cursor = 'pointer';
 
     element.onmousedown = function() {
         shouldPan = true;
@@ -15,8 +15,8 @@ function pannable<T extends HTMLObjectElement>(element: T) {
         if (shouldPan) {
             const { movementX, movementY } = event;
             const [horizontalOffset, verticalOffset, ...zoomLevels] = element.getAttribute('viewBox').split(' ').map(Number);
-            const newHOffset = horizontalOffset - movementX * 1.2;
-            const newYOffset = verticalOffset - movementY * 1.2;
+            const newHOffset = Math.max(horizontalOffset - movementX * 1.2, 0);
+            const newYOffset = Math.max(verticalOffset - movementY * 1.2, 0);
             element.setAttribute('viewBox',  `${newHOffset} ${newYOffset} ${zoomLevels.join(' ')}`);
         }
     };

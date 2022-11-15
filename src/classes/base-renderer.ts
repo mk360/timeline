@@ -147,13 +147,19 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		periodFrame.classList.add('period-frame');
 		const periodNameFrame = componentFactory.createAbsoluteBox(+periodFrame.getAttribute('x'), +periodFrame.getAttribute('y'), 30, +periodFrame.getAttribute('width'), 'rgb(191, 191, 191)', false);
 		periodNameFrame.classList.add('period-name-frame');
-		const periodName = componentFactory.createAbsoluteText(+periodFrame.getAttribute('x') + 10, +periodFrame.getAttribute('y') + 15, period.name, 10, 'black', false);
+		const periodName = componentFactory.createAbsoluteText(+periodFrame.getAttribute('x') + 5, +periodFrame.getAttribute('y') + 15, period.name, 10, 'black', false);
+
 		periodName.classList.add('period-name');
 		const group = componentFactory.createAbsoluteGroup();
 		group.appendChild(periodFrame);
 		group.appendChild(periodNameFrame);
 		group.appendChild(periodName);
 		group.classList.add('period-group');
+
+		const periodWidth = Math.max(+periodNameFrame.getAttribute('width'), periodName.getBBox().width + 10).toString();
+
+		periodNameFrame.setAttribute('width', periodWidth);
+		periodFrame.setAttribute('width', periodWidth);
 	}
 
 	renderEvent(event: Event, linePosition: number, renderPosition: number) {
