@@ -1,6 +1,9 @@
-$gray: rgba(200, 200, 200, 0.9);
 
 #timeline-svg {
+    $gray: rgba(200, 200, 200, 0.9);
+    $fade-duration: 0.3s;
+    $dark-gray: rgb(115, 115, 115);
+
     .event-line {
         transition: fill 0.1s linear;
         fill: $gray;
@@ -8,22 +11,45 @@ $gray: rgba(200, 200, 200, 0.9);
 
     .event-label {
         animation: fadeIn 1.2s;
+        transition: fill $fade-duration linear;
+    }
+
+    .period-frame, .period-name, .period-name-frame {
+        transition: fill linear $fade-duration;
     }
 
     .event-box {
         transition-property: fill, width;
         transition-timing-function: linear, cubic-bezier(0.55, 0, 1, 0.45);
-        transition-duration: 0.2s, 0.4s;
+        transition-duration: $fade-duration, 0.4s;
         fill: $gray;
     }
 
     .event-group:hover {
         .event-line, .event-box {
-            fill: red;
+            fill: $dark-gray;
+        }
+
+        .event-label {
+            fill: beige;
         }
 
         .event-box {
             width: 100%;
+        }
+    }
+
+    .period-group:hover {
+        .period-name {
+            fill: beige;
+        }
+
+        .period-name-frame {
+            fill: $dark-gray;
+        }
+
+        .period-frame {
+            fill: lighten($dark-gray, 10%);
         }
     }
 }
