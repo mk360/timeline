@@ -119,7 +119,7 @@ tplEasternFront.addPeriod({
 
 let tplJapan = ww2tl.addTemporalLine("Japon");
 let evntCapitulationJapon = tplJapan.addEvent({
-	name: "Capitulation du Japon", 
+	name: "Capitulation du Japon",
 	date: [1945, 7, 2]
 });
 

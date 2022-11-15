@@ -39,12 +39,6 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 	private tl: Timeline;
 	private positionGetter = getNextPosition();
 	private renderOffset: number;
-	private boundingBox: BoundingBox = {
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-	};
 
 	render(timeline: Timeline) {
 		this.tl = timeline;
@@ -57,7 +51,6 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		}
 
 		this.renderReferenceLine();
-		this.bindListeners();
 	}
 
 	renderReferenceLine() {
@@ -82,17 +75,6 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		return Math.floor(timelinePoint / yearOffset);
 	}
 
-	bindListeners() {
-		const eventBoxes = Array.from<SVGRectElement>(document.querySelectorAll('.event-box'));
-
-		// for (let box of eventBoxes) {
-		// 	box.onmouseover = function() {
-		// 		box.parentElement.parentElement.insertBefore(box.parentElement, box.parentElement.previousElementSibling);
-		// 		box.parentElement.parentElement.removeChild(box.parentElement);
-		// 	}
-		// }
-	}
-
 	getEventsFromPeriod(period: Period, storedEvents?: Event[]) {
 		let events: Event[] = storedEvents ?? [];
 		for (let chronon of period.sub_chronons) {
@@ -112,6 +94,8 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		const { chronons } = line;
 		let events: Event[] = [];
 		const periods: Period[] = [];
+
+		componentFactory.createAbsoluteText(0, temporalLinePosition - SvgConfig.temporalLineHeight + 10, line.name, 10, 'black');
 
 		for (let chronon of chronons) {
 			if (chronon instanceof Period) {
@@ -164,20 +148,17 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 
 	renderEvent(event: Event, linePosition: number, renderPosition: number) {
 		const y1 = linePosition;
-		const eventNotch = componentFactory.createAbsoluteLine(renderPosition, y1, 40, -90, 'rgba(200, 200, 200, 0.9)', 2, false);
-		eventNotch.classList.add('event-line');
-		const eventLineY2 = +eventNotch.getAttribute('y2');
 		const boxHeight = SvgConfig.eventBoxHeight;
 		const group = componentFactory.createAbsoluteGroup();
 		group.classList.add('event-group');
-		const eventBox = componentFactory.createAbsoluteBox(+eventNotch.getAttribute('x1') - 1, eventLineY2 - boxHeight / 2, boxHeight, boxHeight * 2, 'rgba(200, 200, 200, 0.9)', false);
+		const eventBox = componentFactory.createAbsoluteBox(renderPosition - 1, linePosition - boxHeight, boxHeight, boxHeight * 2, 'rgba(200, 200, 200, 0.9)', false);
 		eventBox.classList.add('event-box');
 		eventBox.setAttribute('rx', '4');
 		eventBox.setAttribute('ry', '4');
 		
 		const eventLabel = componentFactory.createAbsoluteText(+eventBox.getAttribute('x') + 4, +eventBox.getAttribute('y') + 17, event.name, 16, 'black', false);
 		eventLabel.classList.add('event-label');
-		group.append(eventBox, eventNotch, eventLabel);
+		group.append(eventBox, eventLabel);
 		eventBox.setAttribute('width', `${eventLabel.getBBox().width + 10}px`);
 	}
 }

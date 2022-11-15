@@ -23,6 +23,7 @@
         transition-timing-function: linear, cubic-bezier(0.55, 0, 1, 0.45);
         transition-duration: $fade-duration, 0.4s;
         fill: $gray;
+        opacity: 0.9;
     }
 
     .event-group:hover {
@@ -32,10 +33,6 @@
 
         .event-label {
             fill: beige;
-        }
-
-        .event-box {
-            width: 100%;
         }
     }
 
