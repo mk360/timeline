@@ -40,8 +40,11 @@ class Calendar implements CalendarStruct {
 		this.calendarConvTable = new Matrix(1, 1);
 	};
 
+	// === API ===
+	// ==== MANAGER ====
+
 	/**
-	 * Creates a Division instance with params and calls calendar.addDivision with the created instance
+	 * Creates a Division instance with params and push it to the divisions array
 	 * @method addDivision
 	 * @param {string} name - The name of the division
 	 * @param {(number|number[])} [unitsLength] - The number of units in which this division is subdivided (for exemple, 12 for a year divided in months). A number[] indicates that the division is irregularily subdivided (like months whose number of days depends of said month)
@@ -52,90 +55,33 @@ class Calendar implements CalendarStruct {
 		this.computeCalendarConvTable();
 	};
 
+	/**
+	 * Adds a secondary division (like weeks) to the calendar to the secondaryDivisions array
+	 * @method addSecondaryDivision
+	 * @param {string} name - The name of the secondary division
+	 * @param {number} level - The division which it groups (i.e. weeks group days, its level is the index of the day Division in the divisions array)
+	 * @param {number} unitsLength - The number of units that are grouped together by this secondary division (i.e. 7 for weeks)
+	 * @param {string[]} [unitsNames] - The name of each unit (i.e. the name of the days of the week) 
+	 */
 	addSecondaryDivision(name: string, level: number, unitsLength: number, unitsNames?: string[]) {
 		this.secondaryDivisions.push(new SecondaryDivision(name, level, unitsLength, unitsNames));
 	};
 
 	/**
-	 * Computes the conversion rates for calendarConvTable
-	 * @method computeCalendarConvTable
+	 * Adds an irregularity to the standard structure of the calendar
+	 * @method addOddity
+	 * @param {number} div - The division on which the oddity is
+	 * @param {number} unit - The unit modified by the oddity
+	 * @param {number} value - The odd value of the unit
+	 * @param {checker_div} value - The div which serves to check the oddity
+	 * @param {((...cond_unit: number[]) => boolean)} condition - A function to check wether a value triggers the oddity or not
+	 * @param {((...boundaries: number[]) => number)} occurences - A function to compute the number of time a oddity appears during an interval
 	 */
-	computeCalendarConvTable(): void {
-		if (this.divisions.length<2) {
-			this.calendarConvTable.values[0][0] = 1;
-
-			return;
-		}
-
-		this.calendarConvTable = new Matrix(this.divisions.length, this.divisions.length);
-
-		for (let i = 0; i < this.divisions.length; ++i)
-			for (let j = 0; j < this.divisions.length; ++j)
-				this.calendarConvTable.values[i][j] = this.computeCalendarLengthOfDeepness(i, j);
-
-		this.printConvTable();
+	addOddity(div: number, unit: number, value: number, checker_div: number, condition: ((...cond_unit: number[]) => boolean), occurences: ((...boundaries: number[]) => number)): void {
+		this.oddities.push(new Oddity(div, unit, value, checker_div, condition, occurences));
 	};
 
-	private getDivisionLength(unit: number | ((calendar: Calendar, length: number) => number)) {
-		if (typeof unit === 'number') {
-			return unit;
-		}
-
-		return unit(this, 2000);
-	}
-
-	/**
-	 * Computes the conversion rate between 2 divisions of the calendar
-	 * @private
-	 * @method computeCalendarLengthOfDeepness
-	 * @param {number} deepness - The 1st from which we convert
-	 * @param {number} [maxDeepness=-1] - The 2nd division to which we convert. If value is omitted, -1 is fed to the method and treated as a special case: maxDeepness is set to divisions.length-1
-	 * @returns {(number|null)} - Returns the conversion rate between deepness and maxDeepness, or null if deepness > maxDeepness
-	 */
-	private computeCalendarLengthOfDeepness(deepness: number, maxDeepness: number = -1): number | null {
-		if (maxDeepness == -1)
-			maxDeepness = this.divisions.length-1;
-
-		if (deepness == maxDeepness)
-			return 1;
-		if (deepness > maxDeepness)
-			return null;
-
-		let sublength: number;
-		let currDiv: Division = this.divisions[deepness];
-
-		if (typeof currDiv.unitsLength === 'number')
-			sublength = currDiv.unitsLength;
-		else if (Array.isArray(currDiv.unitsLength)) {
-			const depthLength = currDiv.unitsLength.reduce<number>((accumulator, current) => {return accumulator + current;}, 0);
-			sublength = depthLength / currDiv.unitsLength.length;
-		} else if (typeof currDiv.unitsLength === 'undefined')
-			sublength = 1;
-
-		if (this.divisions[deepness+1].unitsLength !== undefined) {
-
-			if (typeof this.divisions[deepness+1].unitsLength === 'number')
-				return sublength*(this.computeCalendarLengthOfDeepness(deepness+1, maxDeepness) ?? 1);
-			else if (Array.isArray(this.divisions[deepness+1].unitsLength))
-				return sublength*(this.computeCalendarLengthOfDeepness(deepness+1, maxDeepness) ?? 1);
-		}
-		else
-			return sublength;
-
-	};
-
-	/**
-	 * Gets the conversion rate from the calendarConvTable
-	 * @param {number} supUnit - The 1st from which we convert
-	 * @param {number} [subUnit=-1] - The 2nd division to which we convert. If value is omitted, -1 is fed to the method and treated as a special case: subUnit is set to divisions.length-1
-	 * @returns {number} - The conversion rate between supUnit and subUnit
-	 */
-	getConv(supUnit: number, subUnit: number = -1): number {
-		if (subUnit == -1)
-			subUnit = this.divisions.length-1;
-
-		return this.calendarConvTable.at(supUnit, subUnit);
-	};
+	// ==== UTILITY ====
 
 	/**
 	 * Compute the elapsed time in basic division time between the date and the zero point of the calendar
@@ -151,15 +97,13 @@ class Calendar implements CalendarStruct {
 		for (let i: number = 0; i < date.length; ++i) {
 			const divUnits = this.divisions[i].unitsLength;
 
-			if (Array.isArray(divUnits)) {
-				let t = divUnits.slice(0, date[i]-1).reduce<number>((acc, unitLength) => {return acc + unitLength}, 0);
-				elapsedTime += t;
-			}
+			if (Array.isArray(divUnits))
+				elapsedTime += divUnits.slice(0, date[i]-1).reduce<number>((acc, unitLength) => {return acc + unitLength}, 0);
 			else {
 				if (i == date.length-1)
 					elapsedTime += date[i]-1;
 				else
-					elapsedTime += (date[i]-1)*this.getConv(i);
+					elapsedTime += (date[i]-1)*this.getConv(i, this.divisions.length-1);
 			}
 
 		}
@@ -173,20 +117,6 @@ class Calendar implements CalendarStruct {
 		}
 
 		return elapsedTime;
-	};
-
-	/**
-	 * Adds an irregularity to the standard structure of the calendar
-	 * @method addOddity
-	 * @param {number} [div] - The division on which the oddity is
-	 * @param {number} [unit] - The unit modified by the oddity
-	 * @param {number} [value] - The odd value of the unit
-	 * @param {checker_div} [value] - The div which serves to check the oddity
-	 * @param {((...cond_unit: number[]) => boolean)} [condition] - A function to check wether a value triggers the oddity or not
-	 * @param {((...boundaries: number[]) => number)} [occurences] - A function to compute the number of time a oddity appears during an interval
-	 */
-	addOddity(div: number, unit: number, value: number, checker_div: number, condition: ((...cond_unit: number[]) => boolean), occurences: ((...boundaries: number[]) => number)): void {
-		this.oddities.push(new Oddity(div, unit, value, checker_div, condition, occurences));
 	};
 
 	/**
@@ -227,6 +157,8 @@ class Calendar implements CalendarStruct {
 		return true;
 	};
 
+	// ==== DEBUG ====
+
 	/**
 	 * Prints the conversion table as a matrix
 	 * @method printConvTable
@@ -235,13 +167,87 @@ class Calendar implements CalendarStruct {
 		let str: string;
 		for (let i = 0; i < this.divisions.length; ++i) {
 			str='';
-			for (let j = 0; j < this.divisions.length; ++j) {
+			for (let j = 0; j < this.divisions.length; ++j)
 				str = str + this.calendarConvTable.at(i, j) + ', ';
-			}
+
 			console.log(str);
 		}
 
 	};
+
+	// === INTERNALS ===
+
+	/**
+	 * Computes the conversion rates for calendarConvTable
+	 * @method computeCalendarConvTable
+	 */
+	private computeCalendarConvTable(): void {
+		if (this.divisions.length<2) {
+			this.calendarConvTable.values[0][0] = 1;
+
+			return;
+		}
+
+		this.calendarConvTable = new Matrix(this.divisions.length, this.divisions.length);
+
+		for (let i = 0; i < this.divisions.length; ++i)
+			for (let j = 0; j < this.divisions.length; ++j)
+				this.calendarConvTable.values[i][j] = this.computeCalendarLengthOfDeepness(i, j);
+
+		this.printConvTable();
+	};
+
+	/**
+	 * Computes the conversion rate between 2 divisions of the calendar
+	 * @private
+	 * @method computeCalendarLengthOfDeepness
+	 * @param {number} deepness - The 1st from which we convert
+	 * @param {number} [maxDeepness=-1] - The 2nd division to which we convert. If value is omitted, -1 is fed to the method and treated as a special case: maxDeepness is set to divisions.length-1
+	 * @returns {(number|null)} - Returns the conversion rate between deepness and maxDeepness, or null if deepness > maxDeepness
+	 */
+	private computeCalendarLengthOfDeepness(deepness: number, maxDeepness: number): number | null {
+		//if (maxDeepness == -1)
+		//	maxDeepness = this.divisions.length-1;
+
+		if (deepness == maxDeepness)
+			return 1;
+		if (deepness > maxDeepness)
+			return null;
+
+		let sublength: number;
+		let currDiv: Division = this.divisions[deepness];
+
+		if (typeof currDiv.unitsLength === 'number')
+			sublength = currDiv.unitsLength;
+		else if (Array.isArray(currDiv.unitsLength)) {
+			const depthLength = currDiv.unitsLength.reduce<number>((accumulator, current) => {return accumulator + current;}, 0);
+			sublength = depthLength / currDiv.unitsLength.length;
+		} else if (typeof currDiv.unitsLength === 'undefined')
+			sublength = 1;
+
+		if (this.divisions[deepness+1].unitsLength !== undefined) {
+
+			if (typeof this.divisions[deepness+1].unitsLength === 'number')
+				return sublength*(this.computeCalendarLengthOfDeepness(deepness+1, maxDeepness) ?? 1);
+			else if (Array.isArray(this.divisions[deepness+1].unitsLength))
+				return sublength*(this.computeCalendarLengthOfDeepness(deepness+1, maxDeepness) ?? 1);
+		}
+		else
+			return sublength;
+
+	};
+
+
+	/**
+	 * Gets the conversion rate from the calendarConvTable
+	 * @param {number} supUnit - The 1st from which we convert
+	 * @param {number} [subUnit=-1] - The 2nd division to which we convert. If value is omitted, -1 is fed to the method and treated as a special case: subUnit is set to divisions.length-1
+	 * @returns {number} - The conversion rate between supUnit and subUnit
+	 */
+	private getConv(supUnit: number, subUnit: number): number {
+		return this.calendarConvTable.at(supUnit, subUnit);
+	};
+
 
 }
 

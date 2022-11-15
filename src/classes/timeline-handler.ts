@@ -8,6 +8,9 @@ import Division from './division';
 import Calendar from './calendar-handler';
 import TemporalLine from './temporal-line-handler';
 import getConvTable from '../constants/calendarConversionTable'
+import Chronon from '../interfaces/chronon'
+import Event from '../classes/event'
+import Period from '../classes/period'
 
 /**
  * Handles a timeline, ie, a collection of temporal lines referencing chronons according to a calendar
@@ -37,6 +40,14 @@ class Timeline implements TimelineStruct {
 		console.log("Constructed new Timeline");
 	}
 
+	// === API ===
+	// ==== MANAGER ====
+
+	/**
+	 * Sets the calendar of the timeline
+	 * @method setCalendar
+	 * @param {Calendar} newCalendar - A Calendar instance
+	 */
 	setCalendar(newCalendar: Calendar): void {
 		this.calendar = newCalendar;
 	}
@@ -44,6 +55,7 @@ class Timeline implements TimelineStruct {
 	/**
 	 * Sets the starting point of the timeline. ! This is different from the zero point of the calendar !
 	 * @method setStartingPoint
+	 * @param {number|number[]} time - The starting date, either expressed in terms of basic units elapsed since point zero; or fully qualified
 	 */
 	//time elapsed since 01/01/0001 ou whatever équivalent dans le calendrier
 	setStartingPoint(time: number|number[]): void {
@@ -53,6 +65,11 @@ class Timeline implements TimelineStruct {
 			this.startingPoint = time;
 	};
 
+	/**
+	 * Sets the ending point of the timeline
+	 * @method setEndingPoint
+	 * @param {number|number[]} time - The ending date, either expressed in terms of basic units elapsed since point zero; or fully qualified
+	 */
 	setEndingPoint(time: number | number[]): void {
 		if (Array.isArray(time)) {
 			this.endingPoint = this.calendar.getElapsedTime(time);
@@ -70,7 +87,7 @@ class Timeline implements TimelineStruct {
 	 * @returns {TemporalLine} - The newly created temporal line
 	 */
 	addTemporalLine(name: string, pos?: number): TemporalLine {
-		let newTmpL = new TemporalLine(name, this.calendar, this.startingPoint);
+		let newTmpL = new TemporalLine(name, this.calendar, this.startingPoint, this.computeDate);
 
 		if (typeof pos !== 'undefined')
 		{
@@ -85,17 +102,15 @@ class Timeline implements TimelineStruct {
 		return newTmpL;
 	};
 
-	/**
-	 * Gets the the conversion rate between two divisions
-	 * @method getConvRate
-	 * @param {number} div1 - The division from which we convert
-	 * @param {number} [div2] - The division to which we convert. If ommited, will convert to the base division
-	 * @returns {number} - The conversion rate between div1 and div2
-	 */
-	getConvRate(div1: number, div2?: number): number {
-		return this.calendar.getConv(div1, div2);
-	};
+	// ==== OPERATIONS ====
 
+	/**
+	 * Converts the timeline to another calendar using conversion rate
+	 * @method convertsTo
+	 * @param {Calendar} cal - The target calendar
+	 * @constructs Timeline
+	 * @returns {Timeline} - The converted Timeline 
+	 */
 	convertsTo(cal: Calendar): Timeline {
 		var converted_tl: Timeline = new Timeline(cal);
 		converted_tl.startingPoint = this.startingPoint + getConvTable(this.calendar.id, cal.id);
@@ -104,12 +119,37 @@ class Timeline implements TimelineStruct {
 		return converted_tl;
 	}
 
+	/**
+	 * Converts the timeline to another calendar with conversion rate expressed
+	 * @method convertsToWithRate
+	 * @param {Calendar} cal - The target calendar
+	 * @constructs Timeline
+	 * @returns {Timeline} - The converted Timeline 
+	 */
 	convertsToWithRate(cal: Calendar, rate: number): Timeline {
 		var converted_tl: Timeline = new Timeline(cal);
 		converted_tl.startingPoint = this.startingPoint + rate;
 		converted_tl.temporalLines = this.temporalLines
 
 		return converted_tl;
+	}
+
+	/**
+	 * Computes the date in basic units of the calendar from the starting point of the timeline
+	 * @method computeDate
+	 * @param {(number[]|Chronon)} date - The date at which the event occurred. If it's a number[], the time elapsed since timeline's starting point is computed. If it's a Chronon, the Chronon's internal date is used
+	 * @param {boolean} [putAtEnd=false] - A boolean flag used if the date parameter is a Period. If putAtEnd is true, the added event will use the ending date of the Period (it will be put at the end of the period). Otherwise, it's the starting date of the Period that will be used
+	 * @returns {number} - The date computed 
+	 */
+	computeDate(date: number[] | Chronon, putAtEnd: boolean): number {
+		if (Array.isArray(date))
+			return this.calendar.getElapsedTime(date)-this.startingPoint;
+		else if (date instanceof Event)
+			return date.occuring_time;
+		else if (date instanceof Period)
+			return putAtEnd ? date.end : date.start;
+		else
+			return -1; //throw err
 	}
 
 }
