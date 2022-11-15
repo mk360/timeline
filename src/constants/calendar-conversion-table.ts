@@ -2,7 +2,11 @@ var cct = new Map();
 cct.set("ltq-scl", 227016);
 cct.set("scl-ltq", -227016);
 
-export default function calendarConversionTable(a: String, b: String){return cct.get(a+"-"+b);};
+function calendarConversionTable(a: string, b: string) {
+	return cct.get(a+"-"+b);
+};
+
+export default calendarConversionTable;
 
 /*
 	a : stellaire

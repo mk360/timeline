@@ -41,9 +41,11 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 
 	render(timeline: Timeline) {
 		this.tl = timeline;
-
 		let temporalLinePosition = SvgConfig.height / 2;
+
+		
 		for (let line of this.tl.temporalLines) {
+			console.log({ temporalLinePosition });
 			this.renderTemporalLine(line, temporalLinePosition);
 			this.renderOffset = this.positionGetter.next().value;
 			temporalLinePosition += this.renderOffset;

@@ -27,7 +27,7 @@ class Calendar implements CalendarStruct {
 	/** @member {Matrix} calendarConvTable - A matrix filled with the conversion rates between calendar's divisions */
 	calendarConvTable: Matrix;
 	oddities: Oddity[];
-	id: String;
+	id: string;
 
 	/**
 	 * Creates a new calendar. Sets members to the identity element and create a matrix of 1,1 for the conversion table
