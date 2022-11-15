@@ -6,7 +6,6 @@ import Event from './event';
 import Timeline from './timeline-handler';
 import Period from './period';
 import getChrononStart from '../methods/get-chronon-start';
-import BoundingBox from '../interfaces/bounding-box';
 
 function* getNextPositionMultiplier() {
 	let multiplier = 1;
@@ -95,7 +94,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		let events: Event[] = [];
 		const periods: Period[] = [];
 
-		componentFactory.createAbsoluteText(0, temporalLinePosition - SvgConfig.temporalLineHeight + 10, line.name, 10, 'black');
+		componentFactory.createAbsoluteText(8, temporalLinePosition - SvgConfig.temporalLineHeight + 15, line.name, 10, 'black');
 
 		for (let chronon of chronons) {
 			if (chronon instanceof Period) {
