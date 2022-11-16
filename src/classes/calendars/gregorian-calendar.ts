@@ -12,8 +12,8 @@ gregorianCalendar.addSecondaryDivision("trimestre", 1, 3);
 gregorianCalendar.addSecondaryDivision("semestre", 1, 6);
 
 gregorianCalendar.addOddity(1, 1, 1, 0,
-	(year) => {return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0},
-	(...years) => {return Math.trunc((years[1]-years[0])/4) - Math.trunc((years[1]-years[0])/100) + Math.trunc((years[1]-years[0])/400)}
+	(year) => (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0,
+	(...years) => Math.trunc((years[1]-years[0])/4) - Math.trunc((years[1]-years[0])/100) + Math.trunc((years[1]-years[0])/400)
 );
 
 export default gregorianCalendar;

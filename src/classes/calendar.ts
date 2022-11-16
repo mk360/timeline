@@ -73,7 +73,7 @@ class Calendar implements CalendarInterface {
 	 * @param {number} div - The division on which the oddity is
 	 * @param {number} unit - The unit modified by the oddity
 	 * @param {number} value - The odd value of the unit
-	 * @param {checker_div} value - The div which serves to check the oddity
+	 * @param {number} checker_div - The div which serves to check the oddity
 	 * @param {((...cond_unit: number[]) => boolean)} condition - A function to check wether a value triggers the oddity or not
 	 * @param {((...boundaries: number[]) => number)} occurences - A function to compute the number of time a oddity appears during an interval
 	 */
