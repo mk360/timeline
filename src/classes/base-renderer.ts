@@ -137,7 +137,6 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 	}
 
 	renderEvent(event: Event, linePosition: number, renderPosition: number) {
-		const y1 = linePosition;
 		const boxHeight = SvgConfig.eventBoxHeight;
 		const group = componentFactory.createAbsoluteGroup();
 		group.classList.add('event-group');

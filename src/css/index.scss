@@ -19,16 +19,26 @@
     }
 
     .event-box {
-        transition-property: fill, width;
-        transition-timing-function: linear, cubic-bezier(0.55, 0, 1, 0.45);
-        transition-duration: $fade-duration, 0.4s;
+        transition-property: fill, width, opacity;
+        transition-timing-function: linear, cubic-bezier(0.55, 0, 1, 0.45), linear;
+        transition-duration: $fade-duration, 0.4s, $fade-duration;
         fill: $gray;
-        opacity: 0.9;
+        filter: drop-shadow(3px 3px 2px black);
+    }
+
+    .event-group {
+        transition-property: opacity;
+        transition-timing-function: linear;
+        transition-duration: $fade-duration;
     }
 
     .event-group:hover {
         .event-line, .event-box {
             fill: $dark-gray;
+        }
+
+        & ~ .event-group {
+            opacity: 0;
         }
 
         .event-label {
