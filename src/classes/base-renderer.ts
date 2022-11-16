@@ -7,31 +7,21 @@ import Timeline from './timeline-handler';
 import Period from './period';
 import getChrononStart from '../methods/get-chronon-start';
 
-function* getNextPositionMultiplier() {
-	let multiplier = 1;
-	while (true) {
-		yield multiplier;
-		yield -multiplier;
-		multiplier++;
-	}
-	
-	return multiplier;
-};
-
 function* getNextPosition() {
-	let multiplier = getNextPositionMultiplier();
-
-	let offset = 0;
+	let multiplier = 0;
 
 	while (true) {
-		const nextMultiplier = multiplier.next();
-		yield offset * nextMultiplier.value;
-		if (nextMultiplier.value > 0) {
-			offset += SvgConfig.temporalLineHeight;
+		const x = SvgConfig.temporalLineHeight * multiplier;
+		multiplier *= -1;
+		if (multiplier < 0) {
+			multiplier--;
+		} else {
+			multiplier++;
 		}
+		yield x;
 	}
 
-	return offset;
+	return multiplier;
 };
 
 class BaseTimelineRenderer extends AbsTimelineRenderer {
@@ -41,11 +31,10 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 
 	render(timeline: Timeline) {
 		this.tl = timeline;
-		let temporalLinePosition = SvgConfig.height / 2;
+		let temporalLinePosition = SvgConfig.height / 2 + this.positionGetter.next().value;
 
 		
 		for (let line of this.tl.temporalLines) {
-			console.log({ temporalLinePosition });
 			this.renderTemporalLine(line, temporalLinePosition);
 			this.renderOffset = this.positionGetter.next().value;
 			temporalLinePosition += this.renderOffset;
