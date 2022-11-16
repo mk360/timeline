@@ -1,4 +1,4 @@
-import Calendar from '../calendar-handler'
+import Calendar from '../calendar'
 let gregorianCalendar: Calendar = new Calendar();
 
 gregorianCalendar.id = "scl"

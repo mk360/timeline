@@ -1,4 +1,4 @@
-import Calendar from '../calendar-handler'
+import Calendar from '../calendar'
 let islamicCalendar: Calendar = new Calendar();
 
 islamicCalendar.id = "ltq"

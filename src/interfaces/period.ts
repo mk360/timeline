@@ -1,17 +1,18 @@
 /**
- * @module {PeriodStruct} Period
+ * @module {Period} Period
  */
 
 import Chronon from './chronon'
 
 /**
  * An interface defining the basic elements of periods
- * @interface PeriodStruct
+ * @interface Period
  * @extends Chronon
  */
-interface PeriodStruct extends Chronon {
+interface Period extends Chronon {
 	/** @member {number} start - The start of the period (in basic division units elapsed since the timeline's starting point) */
 	start: number;
+
 	/** @member {number} [end] - The end of the period (in basic division units elapsed since the timeline's starting point). If not given, means that the period is still open in the timeline's scope */
 	end?: number;
 
@@ -27,4 +28,4 @@ interface PeriodStruct extends Chronon {
 
 }
 
-export default PeriodStruct;
+export default Period;

@@ -18,4 +18,3 @@ export default calendarConversionTable;
 	ltq => hégirien
 	scl => grégorien
 */
-

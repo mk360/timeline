@@ -3,11 +3,11 @@
  * @module {Calendar} Calendar
  */
 
-import CalendarStruct from '../interfaces/calendar'
-import Division from '../classes/division'
-import SecondaryDivision from '../classes/secondaryDivision'
-import Oddity from '../classes/oddity-handler'
 import { Matrix } from 'ts-matrix';
+import CalendarInterface from '../interfaces/calendar'
+import Division from './division'
+import Oddity from './oddity'
+import SecondaryDivision from './secondary-division'
 
 /* ===CALENDAR NOTES
 
@@ -19,9 +19,9 @@ import { Matrix } from 'ts-matrix';
 
 /**
  * A class implementing calendar behavior
- * @implements {CalendarStruct}
+ * @implements {CalendarInterface}
  */
-class Calendar implements CalendarStruct {
+class Calendar implements CalendarInterface {
 	divisions: Division[];
 	secondaryDivisions?: Division[];
 	/** @member {Matrix} calendarConvTable - A matrix filled with the conversion rates between calendar's divisions */
@@ -247,7 +247,6 @@ class Calendar implements CalendarStruct {
 	private getConv(supUnit: number, subUnit: number): number {
 		return this.calendarConvTable.at(supUnit, subUnit);
 	};
-
 
 }
 

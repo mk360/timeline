@@ -1,7 +1,7 @@
-import Timeline from './classes/timeline-handler';
+import Timeline from './classes/timeline';
 import BaseTimelineRenderer from './classes/base-renderer';
-import gregorianCalendar from './classes/calendars/gregorianCalendar'
-import islamicCalendar from './classes/calendars/islamicCalendar'
+import gregorianCalendar from './classes/calendars/gregorian-calendar'
+import islamicCalendar from './classes/calendars/islamic-calendar'
  
 // Exemple d'utilisation (sans offsets)
 

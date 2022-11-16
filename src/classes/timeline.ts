@@ -3,27 +3,25 @@
  * @module {TimelineHandler} Timeline
  */
 
-import TimelineStruct from '../interfaces/timeline';
-import Division from './division';
-import Calendar from './calendar-handler';
-import TemporalLine from './temporal-line-handler';
-import getConvTable from '../constants/calendar-conversion-table'
+import TimelineInterface from '../interfaces/timeline';
 import Chronon from '../interfaces/chronon'
-import Event from '../classes/event'
-import Period from '../classes/period'
+import Division from './division';
+import Calendar from './calendar';
+import TemporalLine from './temporal-line';
+import Event from './event'
+import Period from './period'
+import getConvTable from '../constants/calendar-conversion-table'
 
 /**
  * Handles a timeline, ie, a collection of temporal lines referencing chronons according to a calendar
- * @implements {TimelineStruct}
+ * @implements {TimelineInterface}
  */
-class Timeline implements TimelineStruct {
-	/** @member {Calendar} calendar - The calendar reference to keep track of chronons' position in time */
+class Timeline implements TimelineInterface {
 	calendar: Calendar = new Calendar();
-	/** @member {TemporalLine[]} temporalLines - The list of temporal lines in the timeline */
 	temporalLines: TemporalLine[];
-	/** @member {number} startingPoint - The starting date for the timeline. It is stored in a number representing the number of basic calendar division elapsed since the zero point (01/01/01)*/
 	startingPoint: number;
-	/** @member {number} endingPoint - The ending date for the timeline. It is stored in a number representing the number of basic calendar divisions elapsed since the zero point (01/01/01) */
+
+	/** @member {number} endingPoint - The ending date for the timeline. It is stored as a number representing the number of basic calendar divisions elapsed since the zero point (01/01/01) */
 	endingPoint: number;
 
 	/**
@@ -87,7 +85,7 @@ class Timeline implements TimelineStruct {
 	 * @returns {TemporalLine} - The newly created temporal line
 	 */
 	addTemporalLine(name: string, pos?: number): TemporalLine {
-		let newTmpL = new TemporalLine(name, this.calendar, this.startingPoint, this.computeDate);
+		let newTmpL = new TemporalLine(name, this.computeDate.bind(this));
 
 		if (typeof pos !== 'undefined')
 		{

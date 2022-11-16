@@ -1,9 +1,9 @@
 import SvgConfig from '../constants/svg-config';
-import TemporalLineStruct from '../interfaces/temporalLine';
+import TemporalLineStruct from '../interfaces/temporal-line';
 import AbsTimelineRenderer from './abstract-renderer';
 import componentFactory from './component-factory';
 import Event from './event';
-import Timeline from './timeline-handler';
+import Timeline from './timeline';
 import Period from './period';
 import getChrononStart from '../methods/get-chronon-start';
 
