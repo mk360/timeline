@@ -11,14 +11,17 @@ function* getNextPosition() {
 	let multiplier = 0;
 
 	while (true) {
-		const x = SvgConfig.temporalLineHeight * multiplier;
+		const finalHeight = SvgConfig.temporalLineHeight * multiplier;
+
 		multiplier *= -1;
+
 		if (multiplier < 0) {
 			multiplier--;
 		} else {
 			multiplier++;
 		}
-		yield x;
+
+		yield finalHeight;
 	}
 
 	return multiplier;
@@ -52,7 +55,8 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		for (let i = 0; i < endingYear - startingYear + 1; i++) {
 			const computedYear = i + startingYear;
 			const yearPlacement = this.tl.calendar.getElapsedTime([computedYear, 1, 1]) - this.tl.startingPoint;
-			const notch = componentFactory.createAbsoluteBox(yearPlacement, +line.getAttribute('y1') - 5, 10, 1, 'black');
+			const notch = componentFactory.createAbsoluteBox(yearPlacement, +line.getAttribute('y1') - 5, 10, 1);
+			notch.classList.add('notch');
 			componentFactory.createAbsoluteText(+notch.getAttribute('x') - 10, +notch.getAttribute('y') - 5, computedYear.toString(), 10, 'black');
 		}
 	}
@@ -117,9 +121,9 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 
 		const periodDuration = period.end - period.start;
 		const periodHeight = SvgConfig.temporalLineHeight;
-		const periodFrame = componentFactory.createAbsoluteBox(position, linePosition - 80, periodHeight, periodDuration, 'rgb(229, 229, 229)', false);
+		const periodFrame = componentFactory.createAbsoluteBox(position, linePosition - 80, periodHeight, periodDuration, false);
 		periodFrame.classList.add('period-frame');
-		const periodNameFrame = componentFactory.createAbsoluteBox(+periodFrame.getAttribute('x'), +periodFrame.getAttribute('y'), 30, +periodFrame.getAttribute('width'), 'rgb(191, 191, 191)', false);
+		const periodNameFrame = componentFactory.createAbsoluteBox(+periodFrame.getAttribute('x'), +periodFrame.getAttribute('y'), 30, +periodFrame.getAttribute('width'), false);
 		periodNameFrame.classList.add('period-name-frame');
 		const periodName = componentFactory.createAbsoluteText(+periodFrame.getAttribute('x') + 5, +periodFrame.getAttribute('y') + 15, period.name, 10, 'black', false);
 
@@ -140,7 +144,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		const boxHeight = SvgConfig.eventBoxHeight;
 		const group = componentFactory.createAbsoluteGroup();
 		group.classList.add('event-group');
-		const eventBox = componentFactory.createAbsoluteBox(renderPosition - 1, linePosition - boxHeight, boxHeight, boxHeight * 2, 'rgba(200, 200, 200, 0.9)', false);
+		const eventBox = componentFactory.createAbsoluteBox(renderPosition - 1, linePosition - boxHeight, boxHeight, boxHeight * 2, false);
 		eventBox.classList.add('event-box');
 		eventBox.setAttribute('rx', '4');
 		eventBox.setAttribute('ry', '4');

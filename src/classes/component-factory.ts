@@ -21,34 +21,18 @@ class ComponentFactory {
         return childGroup;
     };
 
-    createCircle(relativeX: number, relativeY: number, radius: number, fillColor: string, appendToSVG = true) {
-        const circle = document.createElementNS(svgNS, 'circle');
-        const { x, y } = getAbsoluteCoordinates(relativeX, relativeY);
-        circle.setAttribute('cx', x.toString());
-        circle.setAttribute('cy', y.toString());
-        circle.setAttribute('r', radius.toString());
-        circle.setAttribute('fill', fillColor);
-
-        if (appendToSVG) {
-            this.appendToSVG(circle);
-        }
-
-        return circle;
-    };
-
-    createBox(relativeX: number, relativeY: number, height: number, width: number, fillColor: string, appendToSVG = true) {
+    createBox(relativeX: number, relativeY: number, height: number, width: number) {
         const { x, y } = getAbsoluteCoordinates(relativeX, relativeY);
 
-        return this.createAbsoluteBox(x, y, height, width, fillColor);
+        return this.createAbsoluteBox(x, y, height, width);
     };
 
-    createAbsoluteBox(x: number, y: number, height: number, width: number, fillColor: string, appendToSVG = true) {
+    createAbsoluteBox(x: number, y: number, height: number, width: number,  appendToSVG = true) {
         const box = document.createElementNS(svgNS, 'rect');
         box.setAttribute('x', x.toString());
         box.setAttribute('y', y.toString());
         box.setAttribute('height', height.toString());
         box.setAttribute('width', width.toString());
-        box.setAttribute('fill', fillColor);
 
         if (appendToSVG) {
             this.appendToSVG(box);
