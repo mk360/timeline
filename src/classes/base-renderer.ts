@@ -27,10 +27,22 @@ function* getNextPosition() {
 	return multiplier;
 };
 
+function* createEventBoxIdCounter() {
+	let count = 1;
+
+	while (true) {
+		yield count;
+		count++;
+	}
+
+	return count;
+}
+
 class BaseTimelineRenderer extends AbsTimelineRenderer {
 	private tl: Timeline;
 	private positionGetter = getNextPosition();
 	private renderOffset: number;
+	private eventCounter = createEventBoxIdCounter();
 
 	render(timeline: Timeline) {
 		this.tl = timeline;
@@ -44,13 +56,27 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		}
 		
 		this.renderReferenceLine();
-
 		this.renderSubdivisions();
+		this.bindListeners();
 	}
 
 	renderSubdivisions() {
 		const m = this.tl.calendar.divisions[1];
-		
+	}
+
+	bindListeners() {
+		const eventGroups = document.getElementsByClassName('event-group');
+		for (let i = 0; i < eventGroups.length; i++) {
+			const group = eventGroups[i] as SVGGElement;
+
+			group.onmouseenter = function(e) {
+				group.parentElement.appendChild(group);
+			};
+
+			group.onmouseleave = function() {
+				group.parentElement.insertBefore(group, eventGroups[i]);
+			};
+		}
 	}
 
 	renderReferenceLine() {
