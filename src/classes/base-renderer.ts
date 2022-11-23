@@ -42,8 +42,15 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 			this.renderOffset = this.positionGetter.next().value;
 			temporalLinePosition += this.renderOffset;
 		}
-
+		
 		this.renderReferenceLine();
+
+		this.renderSubdivisions();
+	}
+
+	renderSubdivisions() {
+		const m = this.tl.calendar.divisions[1];
+		
 	}
 
 	renderReferenceLine() {
@@ -88,7 +95,8 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		const { chronons } = line;
 		let events: Event[] = [];
 		const periods: Period[] = [];
-
+		const lineBackground = componentFactory.createAbsoluteBox(0, temporalLinePosition - SvgConfig.temporalLineHeight, SvgConfig.temporalLineHeight, Number.MAX_SAFE_INTEGER);
+		lineBackground.classList.add('temporal-line-background');
 		componentFactory.createAbsoluteText(8, temporalLinePosition - SvgConfig.temporalLineHeight + 15, line.name, 10, 'black');
 
 		for (let chronon of chronons) {

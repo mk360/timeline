@@ -1,8 +1,24 @@
 
 #timeline-svg {
     $gray: rgba(200, 200, 200, 0.9);
-    $fade-duration: 0.3s;
+    $fade-duration: 0.45s;
     $dark-gray: rgb(115, 115, 115);
+    font-family: Helvetica;
+    $light-font-color: beige;
+
+    ::selection {
+        background-color: transparent;
+        fill: $light-font-color;
+    }
+
+    .temporal-line-background {
+        transition: fill $fade-duration linear;
+        fill: $light-font-color;
+
+        &:hover {
+            fill: lighten(gray, 20%);
+        }
+    }
 
     .notch {
         fill: black;
@@ -38,6 +54,12 @@
         filter: drop-shadow(3px 3px 2px black);
     }
 
+    :hover {
+        .event-group:not(:hover) {
+            fill: red;
+        }
+    }
+
     .event-group {
         transition-property: opacity;
         transition-timing-function: linear;
@@ -47,10 +69,6 @@
     .event-group:hover {
         .event-line, .event-box {
             fill: $dark-gray;
-        }
-
-        & ~ .event-group {
-            opacity: 0;
         }
 
         .event-label {
