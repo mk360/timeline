@@ -44,6 +44,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		}
 		
 		this.renderReferenceLine();
+
 		this.bindListeners();
 	}
 
@@ -54,7 +55,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 				const subdivisionDistance = this.tl.calendar.getElapsedTime([greatestDivision, i, 1]) - this.tl.startingPoint;
 				const subdivisionName = division.unitsNames[i - 1];
 				componentFactory.createAbsoluteText(subdivisionDistance + 2, linePosition + 5, subdivisionName, 4, 'black');
-				componentFactory.createAbsoluteBox(subdivisionDistance, linePosition - 5, 10, 1);
+				componentFactory.createAbsoluteBox(subdivisionDistance, linePosition - 5, 10, 0.5);
 			}
 		}
 	}
@@ -64,6 +65,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		for (let i = 0; i < eventGroups.length; i++) {
 			const group = eventGroups[i] as SVGGElement;
 
+			
 			group.onmouseenter = function() {
 				group.parentElement.appendChild(group);
 			};
@@ -72,13 +74,36 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 				group.parentElement.insertBefore(group, eventGroups[i]);
 			};
 		}
+
+		const periodGroups = document.getElementsByClassName('period-group');
+
+		for (let i = 0; i < periodGroups.length; i++) {
+			const group = periodGroups[i] as SVGGElement;
+			const periodNameFrame = group.getElementsByClassName('period-name-frame')[0];
+			const periodFrame = group.getElementsByClassName('period-frame')[0];
+			const periodName = group.getElementsByClassName('period-name')[0] as SVGRectElement;
+			const periodWidth = Math.max(+periodNameFrame.getAttribute('width'), periodName.getBBox().width + 10).toString();
+			
+			const nameFrameWidth = periodNameFrame.getAttribute('width');
+			const frameWidth = periodFrame.getAttribute('width');
+
+			group.onmouseenter = function() {
+				periodNameFrame.setAttribute('width', periodWidth);
+				periodFrame.setAttribute('width', periodWidth);
+			};
+
+			group.onmouseleave = function() {
+				periodNameFrame.setAttribute('width', nameFrameWidth);
+				periodFrame.setAttribute('width', frameWidth);
+			}
+		}
 	}
 
 	renderReferenceLine() {
 		const startingYear = this.getYear(this.tl.startingPoint);
 		const endingYear = this.getYear(this.tl.endingPoint);
 		const linePosition = SvgConfig.height / 2;
-		const line = componentFactory.createAbsoluteLine(0, linePosition, SvgConfig.width, 0, 'black', 1);
+		const line = componentFactory.createAbsoluteLine(0, linePosition, Number.MAX_SAFE_INTEGER, 0, 'black', 1);
 		
 		for (let i = 0; i < endingYear - startingYear + 1; i++) {
 			const computedYear = i + startingYear;
@@ -164,11 +189,8 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		group.appendChild(periodNameFrame);
 		group.appendChild(periodName);
 		group.classList.add('period-group');
-
-		const periodWidth = Math.max(+periodNameFrame.getAttribute('width'), periodName.getBBox().width + 10).toString();
-
-		periodNameFrame.setAttribute('width', periodWidth);
-		periodFrame.setAttribute('width', periodWidth);
+		periodNameFrame.setAttribute('rx', '4');
+		periodNameFrame.setAttribute('ry', '4');
 	}
 
 	renderEvent(event: Event, linePosition: number, renderPosition: number) {

@@ -33,7 +33,7 @@
     }
 
     .event-line {
-        transition: fill 0.1s linear;
+        transition: fill $fade-duration linear;
         fill: $gray;
     }
 
@@ -42,8 +42,14 @@
         transition: fill $fade-duration linear;
     }
 
-    .period-frame, .period-name, .period-name-frame {
+    .period-name {
         transition: fill linear $fade-duration;
+    }
+
+    .period-frame, .period-name-frame {
+        transition-property: fill width;
+        transition-timing-function: linear;
+        transition-duration: $fade-duration, calc($fade-duration / 2);
     }
 
     .event-box {
