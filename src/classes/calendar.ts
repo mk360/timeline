@@ -90,11 +90,11 @@ class Calendar implements CalendarInterface {
 	 * @param {boolean} [fromStartingPoint=false] - !!!
 	 * @returns {number} - The elapsed time in basic division time between the date and the zero point of the calendar
 	 */
- 	getElapsedTime(date: number[], fromStartingPoint: boolean = false): number {
-		let elapsedTime: number = 0;
+ 	getElapsedTime(date: number[]): number {
+		let elapsedTime = 0;
 
 		//primary calculation
-		for (let i: number = 0; i < date.length; ++i) {
+		for (let i = 0; i < date.length; ++i) {
 			const divUnits = this.divisions[i].unitsLength;
 
 			if (Array.isArray(divUnits))
@@ -109,7 +109,7 @@ class Calendar implements CalendarInterface {
 		}
 
 		//secondary calculation
-		for (let i: number = 0; i < this.oddities.length; ++i) {
+		for (let i = 0; i < this.oddities.length; ++i) {
 			elapsedTime += this.oddities[i].getNbOccurences(1, date[this.oddities[i].checker_div]);
 
 			if (this.oddities[i].isOdd(date[this.oddities[i].checker_div]) && (date[this.oddities[i].div] > this.oddities[i].unit+1))

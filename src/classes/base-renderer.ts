@@ -27,22 +27,10 @@ function* getNextPosition() {
 	return multiplier;
 };
 
-function* createEventBoxIdCounter() {
-	let count = 1;
-
-	while (true) {
-		yield count;
-		count++;
-	}
-
-	return count;
-}
-
 class BaseTimelineRenderer extends AbsTimelineRenderer {
 	private tl: Timeline;
 	private positionGetter = getNextPosition();
 	private renderOffset: number;
-	private eventCounter = createEventBoxIdCounter();
 
 	render(timeline: Timeline) {
 		this.tl = timeline;
@@ -56,12 +44,19 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		}
 		
 		this.renderReferenceLine();
-		this.renderSubdivisions();
 		this.bindListeners();
 	}
 
-	renderSubdivisions() {
-		const m = this.tl.calendar.divisions[1];
+	renderSubdivisions(greatestDivision: number, linePosition: number) {
+		for (let divisionIndex = 1; divisionIndex < this.tl.calendar.divisions.length; divisionIndex++) {
+			const division = this.tl.calendar.divisions[1];
+			for (let i = 1; i <= division.unitsNames.length; i++) {
+				const subdivisionDistance = this.tl.calendar.getElapsedTime([greatestDivision, i, 1]) - this.tl.startingPoint;
+				const subdivisionName = division.unitsNames[i - 1];
+				componentFactory.createAbsoluteText(subdivisionDistance + 2, linePosition + 5, subdivisionName, 4, 'black');
+				componentFactory.createAbsoluteBox(subdivisionDistance, linePosition - 5, 10, 1);
+			}
+		}
 	}
 
 	bindListeners() {
@@ -69,7 +64,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		for (let i = 0; i < eventGroups.length; i++) {
 			const group = eventGroups[i] as SVGGElement;
 
-			group.onmouseenter = function(e) {
+			group.onmouseenter = function() {
 				group.parentElement.appendChild(group);
 			};
 
@@ -83,7 +78,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		const startingYear = this.getYear(this.tl.startingPoint);
 		const endingYear = this.getYear(this.tl.endingPoint);
 		const linePosition = SvgConfig.height / 2;
-		const line = componentFactory.createAbsoluteLine(0, linePosition, Number.MAX_SAFE_INTEGER, 0, 'black', 1);
+		const line = componentFactory.createAbsoluteLine(0, linePosition, SvgConfig.width, 0, 'black', 1);
 		
 		for (let i = 0; i < endingYear - startingYear + 1; i++) {
 			const computedYear = i + startingYear;
@@ -91,12 +86,14 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 			const notch = componentFactory.createAbsoluteBox(yearPlacement, +line.getAttribute('y1') - 5, 10, 1);
 			notch.classList.add('notch');
 			componentFactory.createAbsoluteText(+notch.getAttribute('x') - 10, +notch.getAttribute('y') - 5, computedYear.toString(), 10, 'black');
+			this.renderSubdivisions(computedYear, linePosition);
 		}
+
 	}
 
 	getYear(timelinePoint: number) {
-		const yearZero = this.tl.calendar.getElapsedTime([1, 1, 1], false);
-		const yearOne = this.tl.calendar.getElapsedTime([2, 1, 1], false);
+		const yearZero = this.tl.calendar.getElapsedTime([1, 1, 1]);
+		const yearOne = this.tl.calendar.getElapsedTime([2, 1, 1]);
 		const yearOffset = yearOne - yearZero;
 
 		return Math.floor(timelinePoint / yearOffset);
