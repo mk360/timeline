@@ -2,7 +2,8 @@ import Timeline from './classes/timeline';
 import BaseTimelineRenderer from './classes/base-renderer';
 import gregorianCalendar from './classes/calendars/gregorian-calendar'
 import islamicCalendar from './classes/calendars/islamic-calendar'
- 
+import hebrewCalendar from './classes/calendars/hebrew-calendar'
+
 // Exemple d'utilisation (sans offsets)
 
 let ww2tl = new Timeline();
