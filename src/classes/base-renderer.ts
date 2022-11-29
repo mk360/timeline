@@ -35,17 +35,24 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 	render(timeline: Timeline) {
 		this.tl = timeline;
 		let temporalLinePosition = SvgConfig.height / 2 + this.positionGetter.next().value;
-
+		let [lowBoundary, topBoundary] = [temporalLinePosition, temporalLinePosition];
 		
 		for (let line of this.tl.temporalLines) {
+			console.log({ temporalLinePosition });
 			this.renderTemporalLine(line, temporalLinePosition);
 			this.renderOffset = this.positionGetter.next().value;
+			if (temporalLinePosition > 0 && temporalLinePosition > lowBoundary) {
+				lowBoundary = temporalLinePosition;
+			}
+			if (temporalLinePosition < 0 && temporalLinePosition < topBoundary) {
+				topBoundary = temporalLinePosition;
+			}
 			temporalLinePosition += this.renderOffset;
 		}
 		
 		this.renderReferenceLine();
 
-		this.bindListeners();
+		this.bindListeners({ topBoundary, lowBoundary });
 	}
 
 	renderSubdivisions(greatestDivision: number, linePosition: number) {
@@ -60,7 +67,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		}
 	}
 
-	bindListeners() {
+	bindListeners(boundaries: { topBoundary: number; lowBoundary: number }) {
 		const eventGroups = document.getElementsByClassName('event-group');
 		for (let i = 0; i < eventGroups.length; i++) {
 			const group = eventGroups[i] as SVGGElement;
@@ -68,10 +75,18 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 			
 			group.onmouseenter = function() {
 				group.parentElement.appendChild(group);
+				for (let i = 0; i < group.childNodes.length; i++) {
+					const child = group.children[i];
+					child.classList.add('hovered');
+				}
 			};
 
 			group.onmouseleave = function() {
 				group.parentElement.insertBefore(group, eventGroups[i]);
+				for (let i = 0; i < group.childNodes.length; i++) {
+					const child = group.children[i];
+					child.classList.remove('hovered');
+				}
 			};
 		}
 
@@ -97,6 +112,31 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 				periodFrame.setAttribute('width', frameWidth);
 			}
 		}
+
+		let shouldPan = false;
+
+		const svgElement = document.getElementById(SvgConfig.svgId);
+
+    	svgElement.style.cursor = 'pointer';
+
+    	svgElement.onmousedown = function() {
+        	shouldPan = true;
+    	};
+
+		svgElement.onmouseup = function() {
+			shouldPan = false;
+    	};
+
+		svgElement.onmousemove = function(event) {
+			if (shouldPan) {
+				const { movementX, movementY } = event;
+				const [horizontalOffset, verticalOffset, ...zoomLevels] = svgElement.getAttribute('viewBox').split(' ').map(Number);
+				const newHOffset = Math.max(horizontalOffset - movementX * 1.2, 0);
+				const newYOffset = Math.min(boundaries.lowBoundary, verticalOffset - movementY * SvgConfig.panningSensitivity);
+				console.log({ newYOffset, boundaries });
+				svgElement.setAttribute('viewBox',  `${newHOffset} ${newYOffset} ${zoomLevels.join(' ')}`);
+			}
+		};
 	}
 
 	renderReferenceLine() {

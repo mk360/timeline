@@ -1,22 +1,22 @@
 
 #timeline-svg {
     $gray: rgba(200, 200, 200, 0.9);
-    $fade-duration: 0.45s;
+    $theme-color: #3b9eac;
+    $fade-duration: 0.3s;
     $dark-gray: rgb(115, 115, 115);
     font-family: Helvetica;
     $light-font-color: beige;
 
     ::selection {
-        background-color: transparent;
-        fill: $light-font-color;
+        fill: $theme-color;
     }
 
     .temporal-line-background {
         transition: fill $fade-duration linear;
-        fill: $light-font-color;
+        fill: lighten($theme-color, 40%);
 
         &:hover {
-            fill: lighten(gray, 20%);
+            fill: lighten($theme-color, 20%);
         }
     }
 
@@ -25,16 +25,18 @@
     }
 
     .period-frame {
-        fill: rgb(229, 229, 229);
+        fill: lighten($theme-color, 30%);
+        opacity: 0.5;
     }
 
     .period-name-frame {
-        fill: rgb(191, 191, 191);
+        fill: lighten($theme-color, 20%);
+        opacity: 0.5;
     }
 
     .event-line {
         transition: fill $fade-duration linear;
-        fill: $gray;
+        fill: lighten($theme-color, 10%);
     }
 
     .event-label {
@@ -56,14 +58,8 @@
         transition-property: fill, width, opacity;
         transition-timing-function: linear, cubic-bezier(0.55, 0, 1, 0.45), linear;
         transition-duration: $fade-duration, 0.4s, $fade-duration;
-        fill: $gray;
+        fill: $theme-color;
         filter: drop-shadow(3px 3px 2px black);
-    }
-
-    :hover {
-        .event-group:not(:hover) {
-            fill: red;
-        }
     }
 
     .event-group {
@@ -88,11 +84,11 @@
         }
 
         .period-name-frame {
-            fill: $dark-gray;
+            fill: darken($theme-color, 20%);
         }
 
         .period-frame {
-            fill: lighten($dark-gray, 10%);
+            fill: darken($theme-color, 10%);
         }
     }
 }
