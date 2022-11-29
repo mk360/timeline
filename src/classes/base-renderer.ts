@@ -38,7 +38,6 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		let [lowBoundary, topBoundary] = [temporalLinePosition, temporalLinePosition];
 		
 		for (let line of this.tl.temporalLines) {
-			console.log({ temporalLinePosition });
 			this.renderTemporalLine(line, temporalLinePosition);
 			this.renderOffset = this.positionGetter.next().value;
 			if (temporalLinePosition > 0 && temporalLinePosition > lowBoundary) {
@@ -133,7 +132,6 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 				const [horizontalOffset, verticalOffset, ...zoomLevels] = svgElement.getAttribute('viewBox').split(' ').map(Number);
 				const newHOffset = Math.max(horizontalOffset - movementX * 1.2, 0);
 				const newYOffset = Math.min(boundaries.lowBoundary, verticalOffset - movementY * SvgConfig.panningSensitivity);
-				console.log({ newYOffset, boundaries });
 				svgElement.setAttribute('viewBox',  `${newHOffset} ${newYOffset} ${zoomLevels.join(' ')}`);
 			}
 		};
@@ -181,19 +179,23 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 	renderTemporalLine(line: TemporalLineStruct, temporalLinePosition: number) {
 		const referenceLine = componentFactory.createAbsoluteLine(0, temporalLinePosition, Number.MAX_SAFE_INTEGER, 0, 'black', 2);
 		const { chronons } = line;
-		let events: Event[] = [];
+		let events: Event[][] = [];
 		const periods: Period[] = [];
 		const lineBackground = componentFactory.createAbsoluteBox(0, temporalLinePosition - SvgConfig.temporalLineHeight, SvgConfig.temporalLineHeight, Number.MAX_SAFE_INTEGER);
 		lineBackground.classList.add('temporal-line-background');
 		componentFactory.createAbsoluteText(8, temporalLinePosition - SvgConfig.temporalLineHeight + 15, line.name, 10, 'black');
 
 		for (let chronon of chronons) {
+			let eventsContainer: Event[] = [];
+
 			if (chronon instanceof Period) {
 				const subEvents = this.getEventsFromPeriod(chronon);
-				events = events.concat(subEvents);
+				eventsContainer = eventsContainer.concat(subEvents);
+				events.push(eventsContainer);
 				periods.push(chronon);
 			} else if (chronon instanceof Event) {
-				events.push(chronon);
+				eventsContainer.push(chronon);
+				events.push(eventsContainer);
 			}
 		}
 
@@ -202,9 +204,14 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 			this.renderPeriod(period, referenceLine, temporalLinePosition, position);
 		}
 
-		for (let event of events) {
-			const position = getChrononStart(event);
-			this.renderEvent(event, temporalLinePosition, position);
+		for (let eventsContainer of events) {
+			let boxesVerticalPosition = 0;
+			console.log({ eventsContainer });
+			for (let event of eventsContainer) {
+				const position = getChrononStart(event);
+				this.renderEvent(event, temporalLinePosition, position, boxesVerticalPosition);
+				boxesVerticalPosition += 30;
+			}
 		}
 	}
 
@@ -216,8 +223,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		}
 
 		const periodDuration = period.end - period.start;
-		const periodHeight = SvgConfig.temporalLineHeight;
-		const periodFrame = componentFactory.createAbsoluteBox(position, linePosition - 80, periodHeight, periodDuration, false);
+		const periodFrame = componentFactory.createAbsoluteBox(position, linePosition - SvgConfig.temporalLineHeight, SvgConfig.temporalLineHeight, periodDuration, false);
 		periodFrame.classList.add('period-frame');
 		const periodNameFrame = componentFactory.createAbsoluteBox(+periodFrame.getAttribute('x'), +periodFrame.getAttribute('y'), 30, +periodFrame.getAttribute('width'), false);
 		periodNameFrame.classList.add('period-name-frame');
@@ -233,19 +239,21 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		periodNameFrame.setAttribute('ry', '4');
 	}
 
-	renderEvent(event: Event, linePosition: number, renderPosition: number) {
+	renderEvent(event: Event, linePosition: number, renderPosition: number, verticalOffset: number) {
 		const boxHeight = SvgConfig.eventBoxHeight;
 		const group = componentFactory.createAbsoluteGroup();
 		group.classList.add('event-group');
-		const eventBox = componentFactory.createAbsoluteBox(renderPosition - 1, linePosition - boxHeight, boxHeight, boxHeight * 2, false);
+		const eventBox = componentFactory.createAbsoluteBox(renderPosition - 1, linePosition - boxHeight + verticalOffset, boxHeight, boxHeight * 2, false);
 		eventBox.classList.add('event-box');
 		eventBox.setAttribute('rx', '4');
 		eventBox.setAttribute('ry', '4');
 		
-		const eventLabel = componentFactory.createAbsoluteText(+eventBox.getAttribute('x') + 4, +eventBox.getAttribute('y') + 17, event.name, 16, 'black', false);
+		const eventLabel = componentFactory.createAbsoluteText(+eventBox.getAttribute('x') + 4, +eventBox.getAttribute('y') + 14, event.name, 13, 'black', false);
 		eventLabel.classList.add('event-label');
 		group.append(eventBox, eventLabel);
-		eventBox.setAttribute('width', `${eventLabel.getBBox().width + 10}px`);
+		const bbox = eventLabel.getBBox();
+		eventBox.setAttribute('width', `${bbox.width + 10}px`);
+		eventBox.setAttribute('height', `${bbox.height + 5}px`);
 	}
 }
 

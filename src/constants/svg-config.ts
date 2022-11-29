@@ -4,7 +4,7 @@ const SvgConfig = {
     backgroundColor: 'white',
     horizontalCropping: 0,
     verticalCropping: 0,
-    temporalLineHeight: 80,
+    temporalLineHeight: 140,
     eventBoxHeight: 45,
     panningSensitivity: 1.2,
     svgId: 'timeline-svg'
