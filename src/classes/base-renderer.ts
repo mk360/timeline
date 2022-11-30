@@ -31,27 +31,22 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 	private tl: Timeline;
 	private positionGetter = getNextPosition();
 	private renderOffset: number;
+	private topBoundary = 0;
+	private lowBoundary = 0;
 
 	render(timeline: Timeline) {
 		this.tl = timeline;
 		let temporalLinePosition = SvgConfig.height / 2 + this.positionGetter.next().value;
-		let [lowBoundary, topBoundary] = [temporalLinePosition, temporalLinePosition];
 		
 		for (let line of this.tl.temporalLines) {
 			this.renderTemporalLine(line, temporalLinePosition);
 			this.renderOffset = this.positionGetter.next().value;
 			temporalLinePosition += this.renderOffset;
-			if (temporalLinePosition > 0 && temporalLinePosition > lowBoundary) {
-				lowBoundary = temporalLinePosition;
-			}
-			if (temporalLinePosition < 0 && temporalLinePosition < topBoundary) {
-				topBoundary = temporalLinePosition;
-			}
 		}
 		
 		this.renderReferenceLine();
 
-		this.bindListeners({ topBoundary, lowBoundary });
+		this.bindListeners();
 	}
 
 	renderSubdivisions(greatestDivision: number, linePosition: number) {
@@ -66,8 +61,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		}
 	}
 
-	bindListeners(boundaries: { topBoundary: number; lowBoundary: number }) {
-		console.log(boundaries);
+	bindListeners() {
 		const eventGroups = document.getElementsByClassName('event-group');
 		for (let i = 0; i < eventGroups.length; i++) {
 			const group = eventGroups[i] as SVGGElement;
@@ -127,14 +121,14 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 			panTrigger = false;
     	};
 
-		svgElement.onmousemove = function(event) {
+		svgElement.onmousemove = (event) => {
 			if (panTrigger) {
 				const { movementX, movementY } = event;
 				const [horizontalOffset, verticalOffset, ...zoomLevels] = svgElement.getAttribute('viewBox').split(' ').map(Number);
 				const newHOffset = Math.max(horizontalOffset - movementX * 1.2, 0);
 				const newYOffset = verticalOffset - movementY * SvgConfig.panningSensitivity;
-				const canPanDown = newYOffset + SvgConfig.height <= boundaries.lowBoundary + SvgConfig.panningOffset;
-				const canPanUp = newYOffset + SvgConfig.panningOffset >= boundaries.topBoundary;
+				const canPanDown = newYOffset + SvgConfig.height >= this.lowBoundary + SvgConfig.panningOffset;
+				const canPanUp = newYOffset + SvgConfig.panningOffset <= this.topBoundary;
 				const runPan = canPanDown && canPanUp && newHOffset >= 0;
 				if (runPan) {
 					svgElement.setAttribute('viewBox',  `${newHOffset} ${newYOffset} ${zoomLevels.join(' ')}`);
@@ -215,7 +209,6 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 			for (let event of eventsContainer) {
 				const position = getChrononStart(event);
 				this.renderEvent(event, temporalLinePosition, position, boxesVerticalPosition);
-				boxesVerticalPosition += 30;
 			}
 		}
 	}
@@ -239,6 +232,25 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		group.appendChild(periodFrame);
 		group.appendChild(periodNameFrame);
 		group.appendChild(periodName);
+		const maxY = Math.min.apply(null, Array.from(group.children).map((x) => {
+			return +x.getAttribute('y');
+		}));
+
+		const minY = Math.max.apply(null, Array.from(group.children).map((x) => {
+			return +x.getAttribute('y');
+		}));
+
+		if (maxY > this.topBoundary) {
+			this.topBoundary = maxY;
+		}
+
+		if (minY < this.lowBoundary) {
+			this.lowBoundary = minY;
+		}
+
+
+		console.log({ maxY, minY, l: this.lowBoundary, t: this.topBoundary });
+
 		group.classList.add('period-group');
 		periodNameFrame.setAttribute('rx', '4');
 		periodNameFrame.setAttribute('ry', '4');
