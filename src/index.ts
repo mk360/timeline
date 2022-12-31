@@ -16,46 +16,6 @@ ww2tl.setStartingPoint([1932, 9, 1]);
 ww2tl.setEndingPoint([1947, 8, 1]);
 console.log(ww2tl.startingPoint);
 
-let testFev = ww2tl.addTemporalLine("Dummy");
-testFev.addEvent({
-	name: "28/02/1934", 
-	date: [1934, 2, 28]
-});
-testFev.addEvent({
-	name: "01/03/1934", 
-	date: [1934, 3, 1]
-});
-testFev.addEvent({
-	name: "28/02/1935", 
-	date: [1935, 2, 28]
-});
-testFev.addEvent({
-	name: "01/03/1935", 
-	date: [1935, 3, 1]
-});
-testFev.addEvent({
-	name: "28/02/1936", 
-	date: [1936, 2, 28]
-});
-testFev.addEvent({
-	name: "29/02/1936", 
-	date: [1936, 2, 29]
-});
-testFev.addEvent({
-	name: "01/03/1936", 
-	date: [1936, 3, 1]
-});
-testFev.addEvent({
-	name: "28/02/1937", 
-	date: [1937, 2, 28]
-});
-testFev.addEvent({
-	name: "01/03/1937", 
-	date: [1937, 3, 1]
-});
-
-console.log(ww2tl.temporalLines[0].chronons);
-
 // offsets
 // calculs de date ?
 // virer refCalendar
