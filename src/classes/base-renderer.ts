@@ -127,9 +127,9 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 				const [horizontalOffset, verticalOffset, ...zoomLevels] = svgElement.getAttribute('viewBox').split(' ').map(Number);
 				const newHOffset = Math.max(horizontalOffset - movementX * 1.2, 0);
 				const newYOffset = verticalOffset - movementY * SvgConfig.panningSensitivity;
-				const canPanDown = newYOffset + SvgConfig.height >= this.lowBoundary + SvgConfig.panningOffset;
-				const canPanUp = newYOffset + SvgConfig.panningOffset <= this.topBoundary;
-				const runPan = canPanDown && canPanUp && newHOffset >= 0;
+				const canPanDown = newYOffset + SvgConfig.height <= this.topBoundary;
+				const canPanUp = newYOffset + SvgConfig.panningOffset >= this.lowBoundary;
+				const runPan = canPanDown && canPanUp;
 				if (runPan) {
 					svgElement.setAttribute('viewBox',  `${newHOffset} ${newYOffset} ${zoomLevels.join(' ')}`);
 				}
@@ -181,8 +181,20 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		const { chronons } = line;
 		let events: Event[][] = [];
 		const periods: Period[] = [];
-		const lineBackground = componentFactory.createAbsoluteBox(0, temporalLinePosition - SvgConfig.temporalLineHeight, SvgConfig.temporalLineHeight, Number.MAX_SAFE_INTEGER);
-		lineBackground.classList.add('temporal-line-background');
+		const background = componentFactory.createAbsoluteBox(0, temporalLinePosition - SvgConfig.temporalLineHeight, SvgConfig.temporalLineHeight, Number.MAX_SAFE_INTEGER);
+
+		const backgroundBottom = background.getBoundingClientRect().bottom;
+		const backgroundTop = background.getBoundingClientRect().top;
+
+		if (backgroundBottom > this.topBoundary) {
+			this.topBoundary = backgroundBottom;
+		}
+
+		if (backgroundTop < this.lowBoundary) {
+			this.lowBoundary = backgroundTop;
+		}
+
+		background.classList.add('temporal-line-background');
 		componentFactory.createAbsoluteText(8, temporalLinePosition - SvgConfig.temporalLineHeight + 15, line.name, 10, 'black');
 
 		for (let chronon of chronons) {
@@ -232,24 +244,6 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		group.appendChild(periodFrame);
 		group.appendChild(periodNameFrame);
 		group.appendChild(periodName);
-		const maxY = Math.min.apply(null, Array.from(group.children).map((x) => {
-			return +x.getAttribute('y');
-		}));
-
-		const minY = Math.max.apply(null, Array.from(group.children).map((x) => {
-			return +x.getAttribute('y');
-		}));
-
-		if (maxY > this.topBoundary) {
-			this.topBoundary = maxY;
-		}
-
-		if (minY < this.lowBoundary) {
-			this.lowBoundary = minY;
-		}
-
-
-		console.log({ maxY, minY, l: this.lowBoundary, t: this.topBoundary });
 
 		group.classList.add('period-group');
 		periodNameFrame.setAttribute('rx', '4');
@@ -262,8 +256,8 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		group.classList.add('event-group');
 		const eventBox = componentFactory.createAbsoluteBox(renderPosition - 1, linePosition - boxHeight + verticalOffset, boxHeight, boxHeight * 2, false);
 		eventBox.classList.add('event-box');
-		eventBox.setAttribute('rx', '4');
-		eventBox.setAttribute('ry', '4');
+		eventBox.setAttribute('rx', '3');
+		eventBox.setAttribute('ry', '3');
 		
 		const eventLabel = componentFactory.createAbsoluteText(+eventBox.getAttribute('x') + 4, +eventBox.getAttribute('y') + 14, event.name, 13, 'black', false);
 		eventLabel.classList.add('event-label');
