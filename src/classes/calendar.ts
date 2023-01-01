@@ -250,6 +250,13 @@ class Calendar implements CalendarInterface {
 	};
 
 	// ==== DATE ARTITHMETIC ====
+	/**
+	 * Adds a specified duration to a date
+	 * @method add
+	 * @param {number[]} date - The date
+	 * @param {number} duration - The duration to add
+	 * @returns {number} - true The new date
+	 */
 	add(date: number[], duration: number): number[]{
 		let nDate: number[] = date;
 
@@ -274,6 +281,13 @@ class Calendar implements CalendarInterface {
 		return nDate;
 	}
 
+	/**
+	 * Substracts a specified duration to a date
+	 * @method sub
+	 * @param {number[]} date - The date
+	 * @param {number} duration - The duration to substract
+	 * @returns {number} - true The new date
+	 */
 	sub(date: number[], duration: number): number[] {
 		let nDate: number[] = date;
 
