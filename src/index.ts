@@ -13,6 +13,7 @@ ww2tl.setStartingPoint([1932, 9, 1]);
 ww2tl.setEndingPoint([1947, 8, 1]);
 console.log(ww2tl.startingPoint);
 
+
 let testFev = ww2tl.addTemporalLine("Dummy");
 testFev.addEvent({
 	name: "28/02/1934", 
