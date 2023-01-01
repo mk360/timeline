@@ -6,10 +6,15 @@ var cct2: {[column: string]: {[row: string]: number }} = {};
 cct2["ltq"] = {};
 cct2["scl"] = {};
 cct2["xls"] = {};
+
 cct2["ltq"]["scl"] = 227016;
 cct2["scl"]["ltq"] = -227016;
-cct2["xls"]["ltq"] = 0;
+
+cct2["xls"]["ltq"] = 1373429;
+cct2["ltq"]["xls"] = -1373429;
+
 cct2["xls"]["scl"] = 0;
+cct2["scl"]["xls"] = 0;
 
 function foo(a: string, b: string) {
 	return cct2[a][b];

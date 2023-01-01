@@ -10,7 +10,7 @@ hebrewCalendar.addDivision("jour");
 hebrewCalendar.addSecondaryDivision("semaine", 2, 7, ["Yom Rishon", "Yom Sheni", "Yom Shlishi", "Yom Revii", "Yom Hamishi", "Yom Shishi", "Yom Shabbat"]);
 
 //leap month - Adar I
-hebrewCalendar.addOddity(1, 5, 30, 1,
+hebrewCalendar.addOddity(1, 5, 30, 0,
 	(year) => [3, 6, 8, 11, 14, 17, 0].includes(year%19),
 	(year0, year1) => {
 		let duration = year1-year0;
@@ -32,20 +32,20 @@ let drc = [["D", "C", "C", "R", "R", "R", "R", "R", "C", "D", "C", "C", "C"], ["
 hebrewCalendar.addOddity(1, 1, 1, 0,
 	(year) => {
 		let molad = (38004 + Math.floor((year-1)/19)*69715 + offset[year%19]%181440)%181440;
-		let fourTablesLine = moladCategories.findIndex((element) => {element > molad});
+		let fourTablesLine = moladCategories.findIndex((element) => element > molad);
 		let fourTablesColumn = yearTo4TC[year%19];
 
-		return drc[fourTablesLine][fourTablesColumn] === "C";
+		return drc[fourTablesColumn][fourTablesLine] === "C";
 	},
 	(year1, year2) => {
 		let nbOcc = 0;
 
 		for (let year = year1; year < year2; ++year) {
 			let molad = (38004 + Math.floor((year-1)/19)*69715 + offset[year%19]%181440)%181440;
-			let fourTablesLine = moladCategories.findIndex((element) => {element > molad});
+			let fourTablesLine = moladCategories.findIndex((element) => element > molad);
 			let fourTablesColumn = yearTo4TC[year%19];
 
-			if (drc[fourTablesLine][fourTablesColumn] === "C")
+			if (drc[fourTablesColumn][fourTablesLine] === "C")
 				nbOcc++;
 		}
 
@@ -56,20 +56,20 @@ hebrewCalendar.addOddity(1, 1, 1, 0,
 hebrewCalendar.addOddity(1, 2, -1, 0,
 	(year) => {
 		let molad = (38004 + Math.floor((year-1)/19)*69715 + offset[year%19]%181440)%181440;
-		let fourTablesLine = moladCategories.findIndex((element) => {element > molad});
+		let fourTablesLine = moladCategories.findIndex((element) => element > molad);
 		let fourTablesColumn = yearTo4TC[year%19];
 
-		return drc[fourTablesLine][fourTablesColumn] === "D";
+		return drc[fourTablesColumn][fourTablesLine] === "D";
 	},
 	(year1, year2) => {
 		let nbOcc = 0;
 
 		for (let year = year1; year < year2; ++year) {
 			let molad = (38004 + Math.floor((year-1)/19)*69715 + offset[year%19]%181440)%181440;
-			let fourTablesLine = moladCategories.findIndex((element) => {element > molad});
+			let fourTablesLine = moladCategories.findIndex((element) => element > molad);
 			let fourTablesColumn = yearTo4TC[year%19];
 
-			if (drc[fourTablesLine][fourTablesColumn] === "D")
+			if (drc[fourTablesColumn][fourTablesLine] === "D")
 				nbOcc++;
 		}
 

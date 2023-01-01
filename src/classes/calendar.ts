@@ -94,13 +94,13 @@ class Calendar implements CalendarInterface {
 		let elapsedTime = 0;
 
 		//primary calculation
-		for (let i = 0; i < date.length; ++i) {
+		for (let i = 0; i < this.divisions.length; ++i) {
 			const divUnits = this.divisions[i].unitsLength;
 
 			if (Array.isArray(divUnits))
 				elapsedTime += divUnits.slice(0, date[i]-1).reduce<number>((acc, unitLength) => {return acc + unitLength}, 0);
 			else {
-				if (i == date.length-1)
+				if (i === this.divisions.length-1)
 					elapsedTime += date[i]-1;
 				else
 					elapsedTime += (date[i]-1)*this.getConv(i, this.divisions.length-1);
@@ -119,6 +119,95 @@ class Calendar implements CalendarInterface {
 		return elapsedTime;
 	};
 
+	extractDate(timeElapsed: number): number[] {
+		let remainingTimeElapsed: number = timeElapsed;
+		let date: number[] = [];
+
+		//primary computation
+		for (let i = 0; i < this.divisions.length; ++i) {
+			const divUnits = this.divisions[i].unitsLength;
+
+			if (Array.isArray(divUnits)) {
+				let acc = 0;
+
+				for (let j = 0; j < divUnits.length; ++j) {
+					if (acc + divUnits[j] > remainingTimeElapsed) {
+						date[i] = j+1;
+						break;
+					}
+
+					acc += divUnits[j];
+				}
+
+				remainingTimeElapsed -= acc;
+			}
+			else {
+				if (i === this.divisions.length - 1)
+					date[i] = remainingTimeElapsed+1;
+				else {
+					date[i] = Math.floor(remainingTimeElapsed/this.getConv(0, this.divisions.length-1))+1;
+					remainingTimeElapsed %= this.getConv(0, this.divisions.length-1);
+				}
+			}
+		}
+
+////
+		//secondary computation
+		for (let o = 0; o < this.oddities.length; ++o) {
+			let a = this.oddities[o].getNbOccurences(1, date[this.oddities[o].checker_div]);
+
+			for (let i = 0; i < this.divisions.length; ++i) {
+				const divUnits = this.divisions[i].unitsLength;
+
+				if (Array.isArray(divUnits)) {
+					let w = 0;
+					for (let i = 0; i < divUnits.length; ++i) {
+						if (w + divUnits[i] > a) {
+							date[1] -= i;
+
+							if (date[1] <= 0) {
+								date[1] = divUnits.length + date[1];
+								date[0]--;
+							}
+
+							break;
+						}
+
+						w += divUnits[i];
+					}
+
+					a -= w+1;
+				}
+				else {
+					if (i == date.length-1) {
+						date[2] -= a-1;
+
+						if (date[2] <= 0) {
+							const sup = this.divisions[1].unitsLength;
+							if (Array.isArray(sup)) {
+								let b = sup[date[1]];
+								date[1]--;
+								date[2] = b + date[2];
+							}
+							else
+								; // wut ?
+
+						}
+
+					}
+					else {
+						date[0] -= Math.floor(remainingTimeElapsed/this.getConv(0, this.divisions.length-1))+1;
+						a %= this.getConv(0, this.divisions.length-1);
+					}
+				}
+
+			}
+
+		}
+
+		return date;
+	}
+
 	/**
 	 * Verifies that the date inputed is correct in the current calendar
 	 * @method isDateValid
@@ -130,32 +219,94 @@ class Calendar implements CalendarInterface {
 			console.log(date + " is not valid 1");
 			return false;
 		}
-		else {
-			for (let i = 1; i < this.divisions.length; ++i) {					//- i start at 1 because we can't check for top-level division
-				if (typeof this.divisions[i-1].unitsLength !== 'undefined') {
-					const currentUnitLength = this.divisions[i-1].unitsLength;
-					if (Array.isArray(currentUnitLength))
-					{
-						if (date[i] < 0 || date[i] > currentUnitLength[date[i-1]]) {
-							console.log(date + " is not valid but fuck it is");
-							return false; // tmp
-						}
-					}
-					else {
-						if (date[i] < 0 || date[i] > this.divisions[i-1].unitsLength) {
-							console.log(date + " is not valid 3");
-							return false;
-						}
-					}
 
+		for (let i = 1; i < this.divisions.length; ++i) {					// i start at 1 because we can't check for top-level division
+			const superUnitLength = this.divisions[i-1].unitsLength;
+
+			if (Array.isArray(superUnitLength)) {
+				let odd = 0;
+				for (let o = 0; o < this.oddities.length; ++o) {
+					if (this.oddities[o].isOdd(date[this.oddities[o].checker_div]))
+						odd = this.oddities[o].value;
 				}
 
+				if (date[i] <= 0 || date[i] > superUnitLength[date[i-1]-1]+odd)
+					return false;
+			}
+			else {
+				let odd = 0;
+				for (let o = 0; o < this.oddities.length; ++o) {
+					if (this.oddities[o].isOdd(date[this.oddities[o].checker_div]))
+						odd = this.oddities[o].value;
+				}
+
+				if (date[i] <= 0 || date[i] > this.divisions[i-1].unitsLength)
+					return false;
 			}
 
 		}
 
 		return true;
 	};
+
+	// ==== DATE ARTITHMETIC ====
+	add(date: number[], duration: number): number[]{
+		let nDate: number[] = date;
+
+		do {
+			nDate[nDate.length-1]++;
+
+			if(!this.isDateValid(nDate)) {
+				let lookback = 1;
+				do {
+					if (nDate.length-lookback < 0)
+						console.log("Error"); //Error
+
+					nDate[nDate.length-lookback] = 1;
+					nDate[nDate.length-(lookback+1)]++;
+					lookback++;
+				} while (!this.isDateValid(nDate));
+			}
+
+			duration--;
+		} while(duration > 0);
+
+		return nDate;
+	}
+
+	sub(date: number[], duration: number): number[] {
+		let nDate: number[] = date;
+
+		do {
+			nDate[nDate.length-1]--;
+
+			if(!this.isDateValid(nDate)) {
+				let lookback = 1;
+
+				do {
+					if (nDate.length-lookback < 0)
+						console.log("Error"); //Error
+
+					const superUnitLength = this.divisions[nDate.length-(lookback+1)].unitsLength
+					if (Array.isArray(superUnitLength)) {
+						nDate[nDate.length-(lookback+1)]--;
+						nDate[nDate.length-lookback] = typeof superUnitLength[nDate[nDate.length-(lookback+1)]-1] !== 'undefined' ? superUnitLength[nDate[nDate.length-(lookback+1)]-1] : superUnitLength[superUnitLength.length-1];
+					}
+					else {
+						nDate[nDate.length-(lookback+1)]--;
+						nDate[nDate.length-lookback] = superUnitLength;
+					}
+
+					lookback++;
+				} while (!this.isDateValid(nDate));
+
+			}
+
+			duration--;
+		} while(duration > 0);
+
+		return nDate;
+	}
 
 	// ==== DEBUG ====
 
@@ -169,8 +320,6 @@ class Calendar implements CalendarInterface {
 			str='';
 			for (let j = 0; j < this.divisions.length; ++j)
 				str = str + this.calendarConvTable.at(i, j) + ', ';
-
-			console.log(str);
 		}
 
 	};
@@ -236,7 +385,6 @@ class Calendar implements CalendarInterface {
 			return sublength;
 
 	};
-
 
 	/**
 	 * Gets the conversion rate from the calendarConvTable

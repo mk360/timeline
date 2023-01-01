@@ -9,9 +9,6 @@ import hebrewCalendar from './classes/calendars/hebrew-calendar'
 let ww2tl = new Timeline();
 ww2tl.setCalendar(gregorianCalendar);
 
-console.log("Test oddities");
-console.log(ww2tl.calendar.oddities[0].isOdd(1936));
-
 ww2tl.setStartingPoint([1932, 9, 1]);
 ww2tl.setEndingPoint([1947, 8, 1]);
 console.log(ww2tl.startingPoint);
@@ -54,14 +51,10 @@ testFev.addEvent({
 	date: [1937, 3, 1]
 });
 
-console.log(ww2tl.temporalLines[0].chronons);
-
 // offsets
 // calculs de date ?
-// virer refCalendar
 
 let germanyTpl = ww2tl.addTemporalLine("Allemagne");
-console.log(ww2tl.temporalLines);
 
 let evntHitlerChancelier = germanyTpl.addEvent({
 	name: "Adolf Hitler est nommé chancelier du Reich", 
@@ -142,7 +135,47 @@ tplGlobalEvents.addEvent({
 
 new BaseTimelineRenderer().render(ww2tl);
 
+//Il faudrait un getter d'event/period
+
+console.log(ww2tl.temporalLines);
+
+console.log("Date extraction")
+console.log("Ouverture de la Conférence de Potsdam [1945, 7, 17] : " + ww2tl.calendar.extractDate(4702 + 705526));
+console.log("Capitulation du Japon [1945, 7, 2] : " + ww2tl.calendar.extractDate(4687 + 705526));
+console.log("Fin de la campagne de Pologne [1939, 10, 6] : " + ww2tl.calendar.extractDate(2591 + 705526));
+console.log("Invasion de la Pologne [1939, 9, 1] : " + ww2tl.calendar.extractDate(2556 + 705526));
+console.log("Adolf Hitler obtient les pleins pouvoirs [1935, 3, 23] : " + ww2tl.calendar.extractDate(933 + 705526));
+console.log("Incendie du Reichstag [1933, 2, 27] : " + ww2tl.calendar.extractDate(179 + 705526));
+console.log("Arrestation de Karl Dönitz [1945, 5, 23] : " + ww2tl.calendar.extractDate(4647 + 705526));
+console.log("Adolf Hitler est nommé chancelier du Reich [1933, 1, 30] : " + ww2tl.calendar.extractDate(151 + 705526));
+
+console.log("-----------------------------------------------------------");
+
+console.log('28/02/1934 : ' + ww2tl.calendar.extractDate(545 + 705526));
+console.log('01/03/1934 : ' + ww2tl.calendar.extractDate(546 + 705526));
+console.log('28/02/1935 : ' + ww2tl.calendar.extractDate(910 + 705526));
+console.log('01/03/1935 : ' + ww2tl.calendar.extractDate(911 + 705526));
+console.log('28/02/1936 : ' + ww2tl.calendar.extractDate(1275 + 705526));
+console.log('29/02/1936 : ' + ww2tl.calendar.extractDate(1276 + 705526));
+console.log('01/03/1936 : ' + ww2tl.calendar.extractDate(1277 + 705526));
+console.log('28/02/1937 : ' + ww2tl.calendar.extractDate(1641 + 705526));
+console.log('01/03/1937 : ' + ww2tl.calendar.extractDate(1642 + 705526));
+
+console.log(gregorianCalendar.isDateValid([1940, 13, 28]));
+console.log(gregorianCalendar.isDateValid([1940, 2, 28]));
+console.log(gregorianCalendar.isDateValid([1940, 2, 29]));
+console.log(gregorianCalendar.isDateValid([1940, 2, 30]));
+
+console.log(gregorianCalendar.sub([1940, 1, 1], 1));
+
+/*
 console.log("converted")
 let newTL = ww2tl.convertsTo(islamicCalendar);
 console.log("islamicCalendar");
 console.log(newTL);
+//new BaseTimelineRenderer().render(newTL);
+
+let newTL2 = ww2tl.convertsTo(hebrewCalendar);
+console.log("converted++");
+//new BaseTimelineRenderer().render(newTL2);
+*/
