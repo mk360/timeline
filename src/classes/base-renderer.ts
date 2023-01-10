@@ -6,12 +6,13 @@ import Event from './event';
 import Timeline from './timeline';
 import Period from './period';
 import getChrononStart from '../methods/get-chronon-start';
+import ComponentFactory from './component-factory';
 
-function* getNextPosition() {
+function* getNextPosition(temporalLineHeight: number) {
 	let multiplier = 0;
 
 	while (true) {
-		const finalHeight = SvgConfig.temporalLineHeight * multiplier;
+		const finalHeight = temporalLineHeight * multiplier;
 
 		multiplier *= -1;
 
@@ -29,14 +30,24 @@ function* getNextPosition() {
 
 class BaseTimelineRenderer extends AbsTimelineRenderer {
 	private tl: Timeline;
-	private positionGetter = getNextPosition();
 	private renderOffset: number;
 	private topBoundary = 0;
 	private lowBoundary = 0;
+	private config: SvgConfig;
+	private positionGetter;
+	private componentFactory: ComponentFactory;
+
+	constructor(config: SvgConfig) {
+		super();
+		this.config = config;
+		this.positionGetter = getNextPosition(this.config.temporalLineHeight);
+		this.componentFactory = new ComponentFactory(this.config);
+		this.componentFactory.createSVG();
+	}
 
 	render(timeline: Timeline) {
 		this.tl = timeline;
-		let temporalLinePosition = SvgConfig.height / 2 + this.positionGetter.next().value;
+		let temporalLinePosition = this.config.height / 2 + this.positionGetter.next().value;
 		
 		for (let line of this.tl.temporalLines) {
 			this.renderTemporalLine(line, temporalLinePosition);
@@ -55,8 +66,8 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 			for (let i = 1; i <= division.unitsNames.length; i++) {
 				const subdivisionDistance = this.tl.calendar.getElapsedTime([greatestDivision, i, 1]) - this.tl.startingPoint;
 				const subdivisionName = division.unitsNames[i - 1];
-				componentFactory.createAbsoluteText(subdivisionDistance + 2, linePosition + 5, subdivisionName, 4, 'black');
-				componentFactory.createAbsoluteBox(subdivisionDistance, linePosition - 5, 10, 0.5);
+				this.componentFactory.createAbsoluteText(subdivisionDistance + 2, linePosition + 5, subdivisionName, 4, 'black');
+				this.componentFactory.createAbsoluteBox(subdivisionDistance, linePosition - 5, 10, 0.5);
 			}
 		}
 	}
@@ -109,7 +120,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 
 		let panTrigger = false;
 		
-		const svgElement = document.getElementById(SvgConfig.svgId);
+		const svgElement = document.getElementById(this.config.svgId);
 
     	svgElement.style.cursor = 'pointer';
 
@@ -126,9 +137,9 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 				const { movementX, movementY } = event;
 				const [horizontalOffset, verticalOffset, ...zoomLevels] = svgElement.getAttribute('viewBox').split(' ').map(Number);
 				const newHOffset = Math.max(horizontalOffset - movementX * 1.2, 0);
-				const newYOffset = verticalOffset - movementY * SvgConfig.panningSensitivity;
-				const canPanDown = newYOffset + SvgConfig.height <= this.topBoundary;
-				const canPanUp = newYOffset + SvgConfig.panningOffset >= this.lowBoundary;
+				const newYOffset = verticalOffset - movementY * this.config.panningSensitivity;
+				const canPanDown = newYOffset + this.config.height <= this.topBoundary;
+				const canPanUp = newYOffset + this.config.panningOffset >= this.lowBoundary;
 				const runPan = canPanDown && canPanUp;
 				if (runPan) {
 					svgElement.setAttribute('viewBox',  `${newHOffset} ${newYOffset} ${zoomLevels.join(' ')}`);
@@ -140,15 +151,15 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 	renderReferenceLine() {
 		const startingYear = this.getYear(this.tl.startingPoint);
 		const endingYear = this.getYear(this.tl.endingPoint);
-		const linePosition = SvgConfig.height / 2;
-		const line = componentFactory.createAbsoluteLine(0, linePosition, Number.MAX_SAFE_INTEGER, 0, 'black', 1);
+		const linePosition = this.config.height / 2;
+		const line = this.componentFactory.createAbsoluteLine(0, linePosition, Number.MAX_SAFE_INTEGER, 0, 'black', 1);
 		
 		for (let i = 0; i < endingYear - startingYear + 1; i++) {
 			const computedYear = i + startingYear;
 			const yearPlacement = this.tl.calendar.getElapsedTime([computedYear, 1, 1]) - this.tl.startingPoint;
-			const notch = componentFactory.createAbsoluteBox(yearPlacement, +line.getAttribute('y1') - 5, 10, 1);
+			const notch = this.componentFactory.createAbsoluteBox(yearPlacement, +line.getAttribute('y1') - 5, 10, 1);
 			notch.classList.add('notch');
-			componentFactory.createAbsoluteText(+notch.getAttribute('x') - 10, +notch.getAttribute('y') - 5, computedYear.toString(), 10, 'black');
+			this.componentFactory.createAbsoluteText(+notch.getAttribute('x') - 10, +notch.getAttribute('y') - 5, computedYear.toString(), 10, 'black');
 			this.renderSubdivisions(computedYear, linePosition);
 		}
 
@@ -177,11 +188,11 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 	}
 
 	renderTemporalLine(line: TemporalLineStruct, temporalLinePosition: number) {
-		const referenceLine = componentFactory.createAbsoluteLine(0, temporalLinePosition, Number.MAX_SAFE_INTEGER, 0, 'black', 2);
+		const referenceLine = this.componentFactory.createAbsoluteLine(0, temporalLinePosition, Number.MAX_SAFE_INTEGER, 0, 'black', 2);
 		const { chronons } = line;
 		let events: Event[][] = [];
 		const periods: Period[] = [];
-		const background = componentFactory.createAbsoluteBox(0, temporalLinePosition - SvgConfig.temporalLineHeight, SvgConfig.temporalLineHeight, Number.MAX_SAFE_INTEGER);
+		const background = this.componentFactory.createAbsoluteBox(0, temporalLinePosition - this.config.temporalLineHeight, this.config.temporalLineHeight, Number.MAX_SAFE_INTEGER);
 
 		const backgroundBottom = background.getBoundingClientRect().bottom;
 		const backgroundTop = background.getBoundingClientRect().top;
@@ -195,7 +206,7 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		}
 
 		background.classList.add('temporal-line-background');
-		componentFactory.createAbsoluteText(8, temporalLinePosition - SvgConfig.temporalLineHeight + 15, line.name, 10, 'black');
+		this.componentFactory.createAbsoluteText(8, temporalLinePosition - this.config.temporalLineHeight + 15, line.name, 10, 'black');
 
 		for (let chronon of chronons) {
 			let eventsContainer: Event[] = [];
@@ -233,14 +244,14 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 		}
 
 		const periodDuration = period.end - period.start;
-		const periodFrame = componentFactory.createAbsoluteBox(position, linePosition - SvgConfig.temporalLineHeight, SvgConfig.temporalLineHeight, periodDuration, false);
+		const periodFrame = this.componentFactory.createAbsoluteBox(position, linePosition - this.config.temporalLineHeight, this.config.temporalLineHeight, periodDuration, false);
 		periodFrame.classList.add('period-frame');
-		const periodNameFrame = componentFactory.createAbsoluteBox(+periodFrame.getAttribute('x'), +periodFrame.getAttribute('y'), 30, +periodFrame.getAttribute('width'), false);
+		const periodNameFrame = this.componentFactory.createAbsoluteBox(+periodFrame.getAttribute('x'), +periodFrame.getAttribute('y'), 30, +periodFrame.getAttribute('width'), false);
 		periodNameFrame.classList.add('period-name-frame');
-		const periodName = componentFactory.createAbsoluteText(+periodFrame.getAttribute('x') + 5, +periodFrame.getAttribute('y') + 15, period.name, 10, 'black', false);
+		const periodName = this.componentFactory.createAbsoluteText(+periodFrame.getAttribute('x') + 5, +periodFrame.getAttribute('y') + 15, period.name, 10, 'black', false);
 
 		periodName.classList.add('period-name');
-		const group = componentFactory.createAbsoluteGroup();
+		const group = this.componentFactory.createAbsoluteGroup();
 		group.appendChild(periodFrame);
 		group.appendChild(periodNameFrame);
 		group.appendChild(periodName);
@@ -251,15 +262,15 @@ class BaseTimelineRenderer extends AbsTimelineRenderer {
 	}
 
 	renderEvent(event: Event, linePosition: number, renderPosition: number, verticalOffset: number) {
-		const boxHeight = SvgConfig.eventBoxHeight;
-		const group = componentFactory.createAbsoluteGroup();
+		const boxHeight = this.config.eventBoxHeight;
+		const group = this.componentFactory.createAbsoluteGroup();
 		group.classList.add('event-group');
-		const eventBox = componentFactory.createAbsoluteBox(renderPosition - 1, linePosition - boxHeight + verticalOffset, boxHeight, boxHeight * 2, false);
+		const eventBox = this.componentFactory.createAbsoluteBox(renderPosition - 1, linePosition - boxHeight + verticalOffset, boxHeight, boxHeight * 2, false);
 		eventBox.classList.add('event-box');
 		eventBox.setAttribute('rx', '3');
 		eventBox.setAttribute('ry', '3');
 		
-		const eventLabel = componentFactory.createAbsoluteText(+eventBox.getAttribute('x') + 4, +eventBox.getAttribute('y') + 14, event.name, 13, 'black', false);
+		const eventLabel = this.componentFactory.createAbsoluteText(+eventBox.getAttribute('x') + 4, +eventBox.getAttribute('y') + 14, event.name, 13, 'black', false);
 		eventLabel.classList.add('event-label');
 		group.append(eventBox, eventLabel);
 		const bbox = eventLabel.getBBox();

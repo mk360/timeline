@@ -2,6 +2,7 @@ import Timeline from './classes/timeline';
 import BaseTimelineRenderer from './classes/base-renderer';
 import gregorianCalendar from './classes/calendars/gregorian-calendar'
 import islamicCalendar from './classes/calendars/islamic-calendar'
+import SvgConfig from './constants/svg-config';
 import hebrewCalendar from './classes/calendars/hebrew-calendar'
 
 // Exemple d'utilisation (sans offsets)
@@ -134,7 +135,7 @@ tplGlobalEvents.addEvent({
 	date: [1945, 7, 17]
 });
 
-new BaseTimelineRenderer().render(ww2tl);
+new BaseTimelineRenderer(SvgConfig).render(ww2tl);
 
 //Il faudrait un getter d'event/period
 

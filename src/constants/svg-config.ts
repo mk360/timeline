@@ -11,4 +11,17 @@ const SvgConfig = {
     svgId: 'timeline-svg'
 };
 
+interface SvgConfig {
+    height: number;
+    width: number;
+    backgroundColor: string;
+    horizontalCropping: number;
+    verticalCropping: number;
+    temporalLineHeight: number;
+    eventBoxHeight: number;
+    panningOffset: number;
+    panningSensitivity: number;
+    svgId: string;
+}
+
 export default SvgConfig;

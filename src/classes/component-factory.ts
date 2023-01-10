@@ -1,5 +1,4 @@
 import getAbsoluteCoordinates from '../methods/get-absolute-coordinates';
-import SVG from '../svg';
 import degreesToRadians from '../methods/degrees-to-radians';
 import zoomable from '../plugins/zoomable';
 import getAbsoluteValue from '../methods/get-absolute-value';
@@ -7,10 +6,29 @@ import SvgConfig from '../constants/svg-config';
 import '../css/index.scss';
 
 const svgNS = "http://www.w3.org/2000/svg";
-const group = zoomable(document.createElementNS(svgNS, 'g'));
-SVG.appendChild(group);
 
 class ComponentFactory {
+    private config: SvgConfig;
+    private rootGroupElement: SVGGElement;
+
+    constructor(config: SvgConfig) {
+        this.config = config;
+    }
+
+    createSVG() {
+        const group = zoomable(document.createElementNS(svgNS, 'g'));
+        const svgString = `<svg id="${this.config.svgId}" height="${this.config.height}px" width="${this.config.width}px" style="background-color: ${this.config.backgroundColor}" viewBox="${this.config.horizontalCropping} ${this.config.verticalCropping} ${this.config.width} ${this.config.height}"></svg>`;
+        document.body.innerHTML += svgString;
+        const svgElement = document.getElementById(this.config.svgId);
+        svgElement.setAttribute("style", `background-color: ${this.config.backgroundColor}; border: 1px solid black`);
+        svgElement.setAttribute("viewBox", `${this.config.horizontalCropping} ${this.config.verticalCropping} ${this.config.width} ${this.config.height}`)
+        svgElement.setAttributeNS(svgNS, "height", this.config.height.toString() + "px");
+        svgElement.setAttributeNS(svgNS, "width", this.config.width.toString() + "px");
+        svgElement.append(group);
+        this.rootGroupElement = group;
+        return group;
+    }
+
     createAbsoluteGroup(appendToSVG = true) {
         const childGroup = document.createElementNS(svgNS, 'g');
 
@@ -43,7 +61,7 @@ class ComponentFactory {
 
     createText(relativeX: number, relativeY: number, content: string, pixelSize: number, color: string, appendToSVG = true) {
         const { x, y } = getAbsoluteCoordinates(relativeX, relativeY);
-        const sizeInSVG = getAbsoluteValue(pixelSize, SvgConfig.height);
+        const sizeInSVG = getAbsoluteValue(pixelSize, this.config.height);
 
         return this.createAbsoluteText(x, y, content, sizeInSVG, color, appendToSVG);
     };
@@ -89,8 +107,8 @@ class ComponentFactory {
     };
 
     private appendToSVG(element: SVGElement) {
-        group.appendChild(element);
+        this.rootGroupElement.appendChild(element);
     };
 };
 
-export default new ComponentFactory();
+export default ComponentFactory;
