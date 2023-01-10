@@ -75,7 +75,7 @@ class Calendar implements CalendarInterface {
 	 * @param {number} value - The odd value of the unit
 	 * @param {number} checker_div - The div which serves to check the oddity
 	 * @param {((...cond_unit: number[]) => boolean)} condition - A function to check wether a value triggers the oddity or not
-	 * @param {((...boundaries: number[]) => number)} occurences - A function to compute the number of time a oddity appears during an interval
+	 * @param {((...boundaries: number[]) => number)} occurences - A function to compute the number of time an oddity appears during an interval
 	 */
 	addOddity(div: number, unit: number, value: number, checker_div: number, condition: ((...cond_unit: number[]) => boolean), occurences: ((...boundaries: number[]) => number)): void {
 		this.oddities.push(new Oddity(div, unit, value, checker_div, condition, occurences));
@@ -153,57 +153,11 @@ class Calendar implements CalendarInterface {
 
 ////
 		//secondary computation
-		for (let o = 0; o < this.oddities.length; ++o) {
-			let a = this.oddities[o].getNbOccurences(1, date[this.oddities[o].checker_div]);
-
-			for (let i = 0; i < this.divisions.length; ++i) {
-				const divUnits = this.divisions[i].unitsLength;
-
-				if (Array.isArray(divUnits)) {
-					let w = 0;
-					for (let i = 0; i < divUnits.length; ++i) {
-						if (w + divUnits[i] > a) {
-							date[1] -= i;
-
-							if (date[1] <= 0) {
-								date[1] = divUnits.length + date[1];
-								date[0]--;
-							}
-
-							break;
-						}
-
-						w += divUnits[i];
-					}
-
-					a -= w+1;
-				}
-				else {
-					if (i == date.length-1) {
-						date[2] -= a-1;
-
-						if (date[2] <= 0) {
-							const sup = this.divisions[1].unitsLength;
-							if (Array.isArray(sup)) {
-								let b = sup[date[1]];
-								date[1]--;
-								date[2] = b + date[2];
-							}
-							else
-								; // wut ?
-
-						}
-
-					}
-					else {
-						date[0] -= Math.floor(remainingTimeElapsed/this.getConv(0, this.divisions.length-1))+1;
-						a %= this.getConv(0, this.divisions.length-1);
-					}
-				}
-
-			}
-
-		}
+		let remainingUnits = this.getElapsedTime(date) - timeElapsed;
+		if (remainingUnits > 0)
+			date = this.sub(date, remainingUnits);
+		else if (remainingUnits < 0)
+			date = this.add(date, remainingUnits);
 
 		return date;
 	}
@@ -216,18 +170,18 @@ class Calendar implements CalendarInterface {
 	 */
 	isDateValid(date: number[]): boolean {
 		if (date.length !== this.divisions.length) {
-			console.log(date + " is not valid 1");
+			//console.log(date + " is not valid 1");
 			return false;
 		}
 
-		for (let i = 1; i < this.divisions.length; ++i) {					// i start at 1 because we can't check for top-level division
+		for (let i = 1; i < this.divisions.length; ++i) {			// i start at 1 because we can't check for top-level division
 			const superUnitLength = this.divisions[i-1].unitsLength;
 
 			if (Array.isArray(superUnitLength)) {
 				let odd = 0;
 				for (let o = 0; o < this.oddities.length; ++o) {
 					if (this.oddities[o].isOdd(date[this.oddities[o].checker_div]))
-						odd = this.oddities[o].value;
+						odd += this.oddities[o].value;
 				}
 
 				if (date[i] <= 0 || date[i] > superUnitLength[date[i-1]-1]+odd)
@@ -237,7 +191,7 @@ class Calendar implements CalendarInterface {
 				let odd = 0;
 				for (let o = 0; o < this.oddities.length; ++o) {
 					if (this.oddities[o].isOdd(date[this.oddities[o].checker_div]))
-						odd = this.oddities[o].value;
+						odd += this.oddities[o].value;
 				}
 
 				if (date[i] <= 0 || date[i] > this.divisions[i-1].unitsLength)
@@ -258,6 +212,17 @@ class Calendar implements CalendarInterface {
 	 * @returns {number} - true The new date
 	 */
 	add(date: number[], duration: number): number[]{
+		if (!this.isDateValid(date)) {
+			console.log("Date is not valid!");
+			return;
+		}
+
+		if (duration < 0)
+			return this.sub(date, -duration);
+
+		if (duration == 0)
+			return date;
+
 		let nDate: number[] = date;
 
 		do {
@@ -273,6 +238,7 @@ class Calendar implements CalendarInterface {
 					nDate[nDate.length-(lookback+1)]++;
 					lookback++;
 				} while (!this.isDateValid(nDate));
+
 			}
 
 			duration--;
@@ -289,6 +255,17 @@ class Calendar implements CalendarInterface {
 	 * @returns {number} - true The new date
 	 */
 	sub(date: number[], duration: number): number[] {
+		if (!this.isDateValid(date)) {
+			console.log("Date is not valid!");
+			return;
+		}
+
+		if (duration < 0)
+			return this.add(date, -duration);
+
+		if (duration == 0)
+			return date;
+
 		let nDate: number[] = date;
 
 		do {
@@ -304,11 +281,32 @@ class Calendar implements CalendarInterface {
 					const superUnitLength = this.divisions[nDate.length-(lookback+1)].unitsLength
 					if (Array.isArray(superUnitLength)) {
 						nDate[nDate.length-(lookback+1)]--;
-						nDate[nDate.length-lookback] = typeof superUnitLength[nDate[nDate.length-(lookback+1)]-1] !== 'undefined' ? superUnitLength[nDate[nDate.length-(lookback+1)]-1] : superUnitLength[superUnitLength.length-1];
+
+						let odd = 0;
+						for (let o = 0; o < this.oddities.length; ++o) {
+							let hasSupUnitOddity: boolean = this.oddities[o].div === nDate.length-(lookback+1);
+							let isThisDateOdd: boolean = this.oddities[o].isOdd(nDate[this.oddities[o].checker_div]);
+							let isDateUnitAffectedByOddity: boolean = this.oddities[o].unit === nDate[nDate.length-(lookback+1)]-1;
+
+							if (hasSupUnitOddity && isThisDateOdd && isDateUnitAffectedByOddity)
+								odd += this.oddities[o].value;
+						}
+
+						nDate[nDate.length-lookback] = typeof superUnitLength[nDate[nDate.length-(lookback+1)]-1] !== 'undefined' ? superUnitLength[nDate[nDate.length-(lookback+1)]-1]+odd : superUnitLength[superUnitLength.length-1]+odd;
 					}
 					else {
 						nDate[nDate.length-(lookback+1)]--;
-						nDate[nDate.length-lookback] = superUnitLength;
+
+						let odd = 0;
+						for (let o = 0; o < this.oddities.length; ++o) {
+							let hasSupUnitOddity: boolean = this.oddities[o].div === nDate.length-(lookback+1);
+							let isThisDateOdd: boolean = this.oddities[o].isOdd(nDate[this.oddities[o].checker_div]);
+							
+							if (hasSupUnitOddity && isThisDateOdd)
+								odd += this.oddities[o].value;
+						}
+
+						nDate[nDate.length-lookback] = superUnitLength+odd;
 					}
 
 					lookback++;

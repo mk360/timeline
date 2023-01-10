@@ -2,7 +2,7 @@ var cct = new Map();
 cct.set("ltq-scl", 227016);
 cct.set("scl-ltq", -227016);
 
-var cct2: {[column: string]: {[row: string]: number }} = {};
+var cct2: {[column: string]: {[row: string]: number}} = {};
 cct2["ltq"] = {};
 cct2["scl"] = {};
 cct2["xls"] = {};
@@ -24,7 +24,7 @@ function calendarConversionTable(a: string, b: string) {
 	return cct.get(a+"-"+b);
 };
 
-export default calendarConversionTable;
+export default foo;
 
 /*
 	a : stellaire
@@ -33,6 +33,7 @@ export default calendarConversionTable;
 	s : solaire
 	x : lunisolaire
 
-	ltq => hégirien
-	scl => grégorien
+	ltq => islamic
+	scl => gregorian
+	xls => hebrew
 */
