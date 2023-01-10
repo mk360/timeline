@@ -1,4 +1,4 @@
-const SvgConfig = {
+const SvgConfig: SvgConfig = {
     height: 200,
     width: 700,
     backgroundColor: 'white',
@@ -8,7 +8,8 @@ const SvgConfig = {
     eventBoxHeight: 45,
     panningOffset: 5,
     panningSensitivity: 1.2,
-    svgId: 'timeline-svg'
+    svgId: 'timeline-svg',
+    parentElement: document.body,
 };
 
 interface SvgConfig {
@@ -22,6 +23,7 @@ interface SvgConfig {
     panningOffset: number;
     panningSensitivity: number;
     svgId: string;
+    parentElement: Element;
 }
 
 export default SvgConfig;

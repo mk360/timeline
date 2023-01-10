@@ -18,7 +18,7 @@ class ComponentFactory {
     createSVG() {
         const group = zoomable(document.createElementNS(svgNS, 'g'));
         const svgString = `<svg id="${this.config.svgId}" height="${this.config.height}px" width="${this.config.width}px" style="background-color: ${this.config.backgroundColor}" viewBox="${this.config.horizontalCropping} ${this.config.verticalCropping} ${this.config.width} ${this.config.height}"></svg>`;
-        document.body.innerHTML += svgString;
+        this.config.parentElement.innerHTML += svgString;
         const svgElement = document.getElementById(this.config.svgId);
         svgElement.setAttribute("style", `background-color: ${this.config.backgroundColor}; border: 1px solid black`);
         svgElement.setAttribute("viewBox", `${this.config.horizontalCropping} ${this.config.verticalCropping} ${this.config.width} ${this.config.height}`)
