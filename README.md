@@ -1,6 +1,6 @@
 ## Timeline Library
 
-This is a timeline that can display chronogically-connected events, across all sorts of scales  (ex. the effects of the 2008 crisis on each continent of the world, the timeline of your favorite Formula 1 season, or even the timeline of your plans for a birthday party).
+This is a timeline that can display chronogically-connected events, across all sorts of scales  (ex. the effects of the 2008 crisis on each continent of the world, the timeline of your favorite Formula 1 season, or even the timeline of two rival sports teams).
 
 ## Features
 - A simple API: setting the timeline up requires a few lines, and every needed element has a default component that is already provided.
@@ -51,3 +51,26 @@ inst.setCalendar(c1);
 inst.setStartingPoint([year, month, day]);
 inst.setEndingPoint([end_year, end_month, end_day]);
 ```
+
+Now you can start creating events, temporal lines, periods, and get a "real" timeline.
+- An event is a one-off occurrence (ex. a meeting, a sporting event).
+- A Period extends to a certain period of time, and contains many events.
+- A Temporal Line is a separate container for Periods and Events. They tell the Timeline's story from another perspective.
+
+### API
+#### Timeline
+`Timeline.addTemporalLine(name: string)`
+Add a Temporal Line. Returns the temporal line.
+
+`Timeline.setStartingPoint(date: number | number[])`
+Set the Timeline's starting point. Use a number if you want a much more precise value than a date array.
+
+`Timeline.setEndingPoint(date: number | number[])`
+Set the Timeline's ending point. Use a number if you want a much more precise value than a date array.
+
+#### Temporal Line
+`TemporalLine.addEvent(options: EventAddingOptions)`
+Add an event. Options are detailed below.
+
+`TemporalLine.addPeriod(options: PeriodAddingOptions)`
+Add a Period that can contain many events. Options are detailed below.
